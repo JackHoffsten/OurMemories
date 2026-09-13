@@ -80,3 +80,9 @@ npm.cmd run preview
 ```
 
 The build checks TypeScript and creates production assets in `frontend/dist/`. The preview command serves those assets locally. On Linux or macOS, use `npm` instead of `npm.cmd`.
+
+## Continuous integration
+
+GitHub Actions runs on pull requests, pushes to `main`, and manual dispatch. The backend job uses Java 25 to validate the Compose configuration, run PostgreSQL integration tests through Testcontainers, and package the application. The frontend job uses Node.js 24 to install locked dependencies, lint, type-check, and build.
+
+The jobs run independently and cache downloaded dependencies. No project secrets or development database are required. The workflow becomes active when this repository is hosted on GitHub with Actions enabled.
