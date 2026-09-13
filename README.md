@@ -13,11 +13,28 @@ A private digital time capsule for a couple's shared memories, photos, and lette
 
 ## Technology
 
-- Java 26, Spring Boot, Spring Security, and Spring Data JPA
+- Java 25 LTS, Spring Boot, Spring Security, and Spring Data JPA
 - PostgreSQL and Flyway
 - React, TypeScript, and Vite
 - Docker Compose and Caddy
 
 ## Status
 
-Early development. Application setup and running instructions are not available yet.
+The backend scaffold is available. Frontend, database integration, and authentication are not implemented yet.
+
+## Backend
+
+Requires JDK 25 with `JAVA_HOME` configured. The Maven wrapper downloads Maven on its first run.
+
+From `backend/` on Windows:
+
+```powershell
+.\mvnw.cmd verify
+.\mvnw.cmd spring-boot:run
+```
+
+On Linux or macOS, use `./mvnw` instead of `.\mvnw.cmd`.
+
+The server starts on port 8080. No API endpoints are defined yet, so requests to `/` return HTTP 404. Stop the server with Ctrl+C.
+
+`verify` runs the application context test and produces an executable JAR in `backend/target/`. No database or environment file is required at this stage.
