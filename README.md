@@ -20,24 +20,47 @@ A private digital time capsule for a couple's shared memories, photos, and lette
 
 ## Status
 
-The backend and frontend scaffolds are available. Database integration and authentication are not implemented yet.
+The backend and frontend scaffolds include PostgreSQL connectivity and Flyway migrations. Authentication and memory features are not implemented yet.
+
+## Local database
+
+Requires Docker with Linux containers and Docker Compose. From the repository root:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Set `POSTGRES_PASSWORD` in `.env` to a unique alphanumeric password before starting the database. Keep this file private. Other PostgreSQL values can retain their defaults.
+
+```powershell
+docker compose up -d --wait
+docker compose ps
+```
+
+PostgreSQL listens only on localhost, using port 5432 by default. Set `POSTGRES_PORT` in `.env` if that port is already in use. Data persists in a named Docker volume. `docker compose down` stops and removes the container while preserving that volume; adding `--volumes` deletes the database.
+
+These credentials configure a local development database administrator. Production will require separate migration and application roles. Changing credentials in `.env` does not change an already initialized database's credentials.
 
 ## Backend
 
-Requires JDK 25 with `JAVA_HOME` configured. The Maven wrapper downloads Maven on its first run.
+Requires JDK 25 with `JAVA_HOME` configured. The Maven wrapper downloads Maven on its first run. Start the local database before running the application.
 
 From `backend/` on Windows:
 
 ```powershell
 .\mvnw.cmd verify
-.\mvnw.cmd spring-boot:run
+.\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=local'
 ```
 
 On Linux or macOS, use `./mvnw` instead of `.\mvnw.cmd`.
 
 The server starts on port 8080. No API endpoints are defined yet, so requests to `/` return HTTP 404. Stop the server with Ctrl+C.
 
-`verify` runs the application context test and produces an executable JAR in `backend/target/`. No database or environment file is required at this stage.
+The `local` profile reads `.env` from the repository root when launched from `backend/`. Other environments supply database settings through environment variables.
+
+Flyway applies versioned SQL migrations at startup. The first migration creates the `capsule` schema; Flyway tracks migrations in `public.flyway_schema_history`. Hibernate validates the schema and never creates or updates it. Add new migrations rather than editing ones already applied.
+
+`verify` requires a running Docker engine and creates an isolated PostgreSQL container through Testcontainers. It checks startup migrations and repeat migration behavior, without using `.env` or the development database, and produces an executable JAR in `backend/target/`.
 
 ## Frontend
 
