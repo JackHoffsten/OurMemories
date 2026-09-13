@@ -20,7 +20,7 @@ A private digital time capsule for a couple's shared memories, photos, and lette
 
 ## Status
 
-The backend and frontend scaffolds include PostgreSQL connectivity, Flyway migrations, and terminal-based account provisioning. Login, MFA, and memory features are not implemented yet.
+The backend supports PostgreSQL connectivity, Flyway migrations, terminal-based account provisioning, and session authentication with CSRF protection. The frontend remains a welcome page. MFA, login rate limiting, and memory features are not implemented yet; the application is intended for local development at this stage.
 
 ## Local database
 
@@ -54,7 +54,7 @@ From `backend/` on Windows:
 
 On Linux or macOS, use `./mvnw` instead of `.\mvnw.cmd`.
 
-The server starts on port 8080. No API endpoints are defined yet, so requests to `/` return HTTP 404. Stop the server with Ctrl+C.
+The server starts on port 8080. Unauthenticated requests to protected endpoints return HTTP 401. Stop the server with Ctrl+C.
 
 The `local` profile reads `.env` from the repository root when launched from `backend/`. Other environments supply database settings through environment variables.
 
@@ -74,7 +74,21 @@ Choose `FIRST` or `SECOND`, enter a username, and enter the password twice. Pass
 
 Each slot can hold one account; neither slot grants additional permissions. Duplicate usernames and occupied slots are rejected. The database enforces the same two-account limit. Passwords are stored as salted Argon2id hashes.
 
-The command exits after provisioning and does not start a web server. There is no registration endpoint. Login and MFA enrollment will be added separately; provisioned accounts cannot log in yet.
+The command exits after provisioning and does not start a web server. There is no registration endpoint. Provisioned accounts can authenticate through the API; MFA enrollment and the login interface are not implemented yet.
+
+## Authentication API
+
+The API uses a server-side session and a `JSESSIONID` cookie. Clients must retain cookies between requests.
+
+1. `GET /api/auth/csrf` returns `headerName` and `token`. Send the token in the named header on every POST, PUT, PATCH, and DELETE request, including login and logout.
+2. `POST /api/auth/login` accepts `application/x-www-form-urlencoded` fields `username` and `password`. Success returns HTTP 204; invalid credentials return HTTP 401 with no account-specific details. Missing or invalid CSRF tokens return HTTP 403.
+3. Fetch a new CSRF token after login. Login changes the session ID and clears the previous token.
+4. `GET /api/auth/me` returns the authenticated username or HTTP 401 when logged out.
+5. `POST /api/auth/logout` with the current CSRF token invalidates the session and expires its cookie, returning HTTP 204. Fetch another CSRF token before logging in again.
+
+Sessions expire after 30 minutes of inactivity and are lost when the backend restarts. Cookies are HttpOnly, SameSite=Strict, and Secure. The `local` profile disables Secure solely for local HTTP development. Session IDs are never accepted in URLs. Cross-origin access is not enabled; the frontend and API will use the same origin.
+
+With the local backend running, open `http://localhost:8080/api/auth/csrf` to inspect the token response. `http://localhost:8080/api/auth/me` returns HTTP 401 until authenticated. Run `mvnw.cmd verify` to exercise the complete login/logout flow against an isolated database, including invalid credentials, CSRF rejection, and session rotation.
 
 ## Frontend
 

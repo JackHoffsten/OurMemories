@@ -45,4 +45,8 @@ class Account {
     AccountSummary toSummary() {
         return new AccountSummary(id, username, slot, createdAt);
     }
+
+    String passwordHash() {
+        return passwordHash;
+    }
 }
