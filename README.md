@@ -20,7 +20,7 @@ A private digital time capsule for a couple's shared memories, photos, and lette
 
 ## Status
 
-The backend and frontend scaffolds include PostgreSQL connectivity and Flyway migrations. Authentication and memory features are not implemented yet.
+The backend and frontend scaffolds include PostgreSQL connectivity, Flyway migrations, and terminal-based account provisioning. Login, MFA, and memory features are not implemented yet.
 
 ## Local database
 
@@ -61,6 +61,20 @@ The `local` profile reads `.env` from the repository root when launched from `ba
 Flyway applies versioned SQL migrations at startup. The first migration creates the `capsule` schema; Flyway tracks migrations in `public.flyway_schema_history`. Hibernate validates the schema and never creates or updates it. Add new migrations rather than editing ones already applied.
 
 `verify` requires a running Docker engine and creates an isolated PostgreSQL container through Testcontainers. It checks startup migrations and repeat migration behavior, without using `.env` or the development database, and produces an executable JAR in `backend/target/`.
+
+## Provisioning accounts
+
+Build the backend, then run this from `backend/` in an interactive terminal with JDK 25:
+
+```powershell
+java -jar target/our-first-year-0.0.1-SNAPSHOT.jar --provision-account --spring.profiles.active=local
+```
+
+Choose `FIRST` or `SECOND`, enter a username, and enter the password twice. Password input is hidden and is never passed as a command-line argument. Usernames are case-insensitive, 3–32 characters, and allow letters, digits, dots, underscores, and hyphens, starting with a letter or digit. Passwords must be 15–128 characters.
+
+Each slot can hold one account; neither slot grants additional permissions. Duplicate usernames and occupied slots are rejected. The database enforces the same two-account limit. Passwords are stored as salted Argon2id hashes.
+
+The command exits after provisioning and does not start a web server. There is no registration endpoint. Login and MFA enrollment will be added separately; provisioned accounts cannot log in yet.
 
 ## Frontend
 
