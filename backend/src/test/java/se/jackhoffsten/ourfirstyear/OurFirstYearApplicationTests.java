@@ -45,7 +45,7 @@ class OurFirstYearApplicationTests {
 		assertThat(jdbcTemplate.queryForObject(
 				"SELECT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'capsule')",
 				Boolean.class)).isTrue();
-		assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("2");
+		assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("3");
 		assertThat(flyway.info().pending()).isEmpty();
 		assertThat(flyway.validateWithResult().validationSuccessful).isTrue();
 	}

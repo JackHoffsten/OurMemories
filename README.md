@@ -8,7 +8,7 @@ A private digital time capsule for a couple's shared memories, photos, and lette
 - Photo galleries with captions.
 - A welcome letter and personal love notes.
 - An interactive map of shared memories.
-- Two private accounts with password and authenticator verification.
+- Two private accounts with password authentication.
 - A separate demonstration site using fictional content.
 
 ## Technology
@@ -20,7 +20,7 @@ A private digital time capsule for a couple's shared memories, photos, and lette
 
 ## Status
 
-The backend supports PostgreSQL connectivity, Flyway migrations, terminal-based account provisioning, and session authentication with CSRF protection. The frontend remains a welcome page. MFA, login rate limiting, and memory features are not implemented yet; the application is intended for local development at this stage.
+The backend supports PostgreSQL connectivity, Flyway migrations, terminal-based account provisioning, session authentication with CSRF protection, and shared memory management. The frontend remains a welcome page. Login rate limiting and photo uploads are not implemented yet; the application is intended for local development at this stage.
 
 ## Local database
 
@@ -74,7 +74,7 @@ Choose `FIRST` or `SECOND`, enter a username, and enter the password twice. Pass
 
 Each slot can hold one account; neither slot grants additional permissions. Duplicate usernames and occupied slots are rejected. The database enforces the same two-account limit. Passwords are stored as salted Argon2id hashes.
 
-The command exits after provisioning and does not start a web server. There is no registration endpoint. Provisioned accounts can authenticate through the API; MFA enrollment and the login interface are not implemented yet.
+The command exits after provisioning and does not start a web server. There is no registration endpoint. Provisioned accounts can authenticate through the API; the login interface is not implemented yet.
 
 ## Authentication API
 
@@ -89,6 +89,31 @@ The API uses a server-side session and a `JSESSIONID` cookie. Clients must retai
 Sessions expire after 30 minutes of inactivity and are lost when the backend restarts. Cookies are HttpOnly, SameSite=Strict, and Secure. The `local` profile disables Secure solely for local HTTP development. Session IDs are never accepted in URLs. Cross-origin access is not enabled; the frontend and API will use the same origin.
 
 With the local backend running, open `http://localhost:8080/api/auth/csrf` to inspect the token response. `http://localhost:8080/api/auth/me` returns HTTP 401 until authenticated. Run `mvnw.cmd verify` to exercise the complete login/logout flow against an isolated database, including invalid credentials, CSRF rejection, and session rotation.
+
+## Memories API
+
+Both accounts share the same memories and can create, read, edit, and delete them. All endpoints require a logged-in session; mutations also require the current CSRF token. Text is stored as plain text, not HTML.
+
+- `GET /api/memories?page=0&size=20` returns `items`, `page`, `size`, `totalElements`, and `totalPages`. Pages are zero-based, with 1–100 items per page. Memories are sorted by date descending, then ID descending for a stable order when dates match.
+- `GET /api/memories/{id}` returns one memory.
+- `POST /api/memories` creates a memory and returns HTTP 201 with its representation and a `Location` header.
+- `PUT /api/memories/{id}` replaces its content. Include the `version` returned by the most recent read. A stale version returns HTTP 409; reload the memory before retrying.
+- `DELETE /api/memories/{id}` permanently deletes a memory and returns HTTP 204.
+
+POST and PUT accept `application/json`. A fictional creation request:
+
+```json
+{
+  "title": "Our first walk",
+  "story": "We walked by the water and stopped for coffee.",
+  "memoryDate": "2026-01-10",
+  "locationName": "Stockholm"
+}
+```
+
+Titles are required and limited to 120 characters; stories are required and limited to 10,000 characters. `memoryDate` is a required calendar date in `YYYY-MM-DD` format, without a timezone. The optional `locationName` accepts up to 200 characters; a blank location clears it. Surrounding whitespace is trimmed. Responses also include `id`, `createdAt`, `updatedAt`, and `version`. Updates use the same content fields plus `version`.
+
+Invalid input returns HTTP 400 and missing memories return HTTP 404. Error bodies use the Problem Details format. The integration tests exercise both accounts sharing memories, pagination, validation, conflicting edits, and authentication/CSRF requirements against disposable PostgreSQL databases.
 
 ## Frontend
 
