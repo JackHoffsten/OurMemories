@@ -90,7 +90,6 @@ export function MemoryEditor({
 
   return (
     <section className="editor" aria-labelledby="editor-title">
-      <p className="eyebrow">en liten anteckning till oss</p>
       <h1 id="editor-title" tabIndex={-1} ref={heading}>
         {memory ? 'Några fler detaljer…' : 'Minns du när…'}
       </h1>

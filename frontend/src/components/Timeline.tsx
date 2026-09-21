@@ -86,14 +86,12 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
     <section className="timeline" aria-labelledby="timeline-title">
       <div className="timeline-heading">
         <div>
-          <p className="eyebrow">du, jag och alla små stunder</p>
           <h1 id="timeline-title">
             Våra minnen{' '}
             <span className="hand-heart" aria-hidden="true">
               ♡
             </span>
           </h1>
-          <p className="lede">Sånt jag aldrig vill att vi ska glömma.</p>
         </div>
         <button className="primary" ref={addButton} onClick={() => setEditor('new')}>
           + Lägg till ett minne

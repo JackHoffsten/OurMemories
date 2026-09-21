@@ -37,7 +37,7 @@ export function Login({ notice, onLogin }: { notice: string; onLogin: () => Prom
   return (
     <section className="gift-login" aria-labelledby="login-title">
       <div className="gift-introduction">
-        <h1 id="login-title">Bara till dig ♡</h1>
+        <h1 id="login-title">Logga in för att öppna ♡</h1>
       </div>
       <div className={`gift-package${unwrapped ? ' is-unwrapped' : ''}`}>
         <div className="gift-ribbon" aria-hidden="true" />
