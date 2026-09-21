@@ -1,14 +1,68 @@
+import { useCallback, useEffect, useState } from 'react'
+import { api, ApiError, errorMessage } from './api'
+import { Login } from './components/Login'
+import { Timeline } from './components/Timeline'
 import './App.css'
 
 function App() {
+  const [user, setUser] = useState<string | null>(null)
+  const [checking, setChecking] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let active = true
+    api
+      .me()
+      .then((result) => {
+        if (active) setUser(result.username)
+      })
+      .catch((cause) => {
+        if (active && !(cause instanceof ApiError && cause.status === 401))
+          setError(errorMessage(cause))
+      })
+      .finally(() => {
+        if (active) setChecking(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const expired = useCallback(() => {
+    setUser(null)
+    setError('Din session har gått ut. Logga in igen.')
+  }, [])
+
   return (
-    <main className="welcome">
-      <p className="welcome-label">Our story, kept close</p>
-      <h1>Our First Year</h1>
-      <p className="welcome-description">
-        A place for the moments, places, and little things we never want to forget.
-      </p>
-    </main>
+    <>
+      <main id="main">
+        {checking ? (
+          <p className="status" role="status">
+            Öppnar våra minnen…
+          </p>
+        ) : user ? (
+          <>
+            {error && (
+              <p className="notice" role="alert">
+                {error}
+              </p>
+            )}
+            <Timeline onExpired={expired} />
+          </>
+        ) : (
+          <Login
+            notice={error}
+            onLogin={async () => {
+              setUser((await api.me()).username)
+              setError('')
+            }}
+          />
+        )}
+      </main>
+      <footer>
+        Jag älskar dig <span aria-hidden="true">♡</span>
+      </footer>
+    </>
   )
 }
 

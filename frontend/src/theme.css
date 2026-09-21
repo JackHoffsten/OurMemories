@@ -1,0 +1,25 @@
+:root {
+  --color-background: #f5f6ed;
+  --color-text: #304f3d;
+  --color-text-muted: #52694f;
+  --color-paper: #fffdf6;
+  --color-paper-pink: #f8e4e9;
+  --color-paper-pink-soft: #f9edf0;
+  --color-input: #fffef9;
+  --color-border: #d9d6c5;
+  --color-border-green: #a6b49e;
+  --color-border-pink: #ca9aaa;
+  --color-primary: #426b4d;
+  --color-primary-hover: #35583e;
+  --color-on-primary: #fffef9;
+  --color-accent: #a14b70;
+  --color-accent-text: #754158;
+  --color-shadow: #e3e8dc;
+  --color-button-shadow: #c4d1b8;
+  --color-tape-green: #b7c99cad;
+  --color-tape-pink: #e7b5c2a8;
+  --color-ribbon: #e2afbf;
+
+  --font-body: system-ui, sans-serif;
+  --font-handwritten: 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive;
+}
