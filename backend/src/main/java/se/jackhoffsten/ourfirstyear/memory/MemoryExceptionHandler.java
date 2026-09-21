@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 class MemoryExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(OptimisticLockingFailureException.class)
     ProblemDetail concurrentUpdate() {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "Memory has changed. Reload it before editing.");
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT, "Memory has changed. Reload it before editing.");
     }
 }

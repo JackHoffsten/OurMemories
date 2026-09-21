@@ -1,12 +1,11 @@
 package se.jackhoffsten.ourfirstyear.account;
 
+import java.nio.CharBuffer;
+import java.util.Locale;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.nio.CharBuffer;
-import java.util.Locale;
 
 @Service
 public class AccountProvisioningService {
@@ -20,9 +19,11 @@ public class AccountProvisioningService {
 
     @Transactional
     public AccountSummary provision(String username, AccountSlot slot, char[] password) {
-        String normalizedUsername = username == null ? "" : username.strip().toLowerCase(Locale.ROOT);
+        String normalizedUsername =
+                username == null ? "" : username.strip().toLowerCase(Locale.ROOT);
         if (!normalizedUsername.matches("[a-z0-9][a-z0-9._-]{2,31}")) {
-            throw new IllegalArgumentException("Username must be 3–32 characters: letters, digits, dots, underscores or hyphens, starting with a letter or digit.");
+            throw new IllegalArgumentException(
+                    "Username must be 3–32 characters: letters, digits, dots, underscores or hyphens, starting with a letter or digit.");
         }
         if (slot == null) {
             throw new IllegalArgumentException("Choose the FIRST or SECOND account slot.");
@@ -37,7 +38,8 @@ public class AccountProvisioningService {
         try {
             return accounts.saveAndFlush(new Account(normalizedUsername, slot, hash)).toSummary();
         } catch (DataIntegrityViolationException exception) {
-            throw new IllegalStateException("Account could not be created; check whether the username or slot is already in use.");
+            throw new IllegalStateException(
+                    "Account could not be created; check whether the username or slot is already in use.");
         }
     }
 }

@@ -19,7 +19,7 @@ class AuthenticationController {
         return new SessionResponse(authentication.getName());
     }
 
-    record CsrfResponse(String headerName, String token) { }
+    record CsrfResponse(String headerName, String token) {}
 
-    record SessionResponse(String username) { }
+    record SessionResponse(String username) {}
 }

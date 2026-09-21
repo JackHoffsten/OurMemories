@@ -12,24 +12,42 @@ import org.springframework.security.web.SecurityFilterChain;
 class SecurityConfiguration {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET, "/api/auth/csrf").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .anyRequest().authenticated())
+        return http.authorizeHttpRequests(
+                        authorize ->
+                                authorize
+                                        .requestMatchers(HttpMethod.GET, "/api/auth/csrf")
+                                        .permitAll()
+                                        .requestMatchers(HttpMethod.POST, "/api/auth/login")
+                                        .permitAll()
+                                        .anyRequest()
+                                        .authenticated())
                 .requestCache(cache -> cache.disable())
-                .exceptionHandling(errors -> errors
-                        .authenticationEntryPoint((request, response, exception) -> response.setStatus(401))
-                        .accessDeniedHandler((request, response, exception) -> response.setStatus(403)))
-                .formLogin(login -> login
-                        .loginProcessingUrl("/api/auth/login")
-                        .successHandler((request, response, authentication) -> response.setStatus(204))
-                        .failureHandler((request, response, exception) -> response.setStatus(401)))
-                .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
-                        .deleteCookies("JSESSIONID")
-                        .logoutSuccessHandler((request, response, authentication) -> response.setStatus(204)))
-                .sessionManagement(session -> session.sessionFixation(fixation -> fixation.changeSessionId()))
+                .exceptionHandling(
+                        errors ->
+                                errors.authenticationEntryPoint(
+                                                (request, response, exception) ->
+                                                        response.setStatus(401))
+                                        .accessDeniedHandler(
+                                                (request, response, exception) ->
+                                                        response.setStatus(403)))
+                .formLogin(
+                        login ->
+                                login.loginProcessingUrl("/api/auth/login")
+                                        .successHandler(
+                                                (request, response, authentication) ->
+                                                        response.setStatus(204))
+                                        .failureHandler(
+                                                (request, response, exception) ->
+                                                        response.setStatus(401)))
+                .logout(
+                        logout ->
+                                logout.logoutUrl("/api/auth/logout")
+                                        .deleteCookies("JSESSIONID")
+                                        .logoutSuccessHandler(
+                                                (request, response, authentication) ->
+                                                        response.setStatus(204)))
+                .sessionManagement(
+                        session -> session.sessionFixation(fixation -> fixation.changeSessionId()))
                 .build();
     }
 }

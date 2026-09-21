@@ -1,11 +1,10 @@
 package se.jackhoffsten.ourfirstyear.memory;
 
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.net.URI;
 import java.util.UUID;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/memories")
@@ -17,7 +16,9 @@ class MemoryController {
     }
 
     @GetMapping
-    MemoryPage list(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+    MemoryPage list(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
         return memories.list(page, size);
     }
 

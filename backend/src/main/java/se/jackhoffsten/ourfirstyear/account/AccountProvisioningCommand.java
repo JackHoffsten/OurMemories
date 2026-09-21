@@ -1,13 +1,12 @@
 package se.jackhoffsten.ourfirstyear.account;
 
+import java.io.Console;
+import java.util.Arrays;
+import java.util.Locale;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
-import java.io.Console;
-import java.util.Arrays;
-import java.util.Locale;
 
 @Component
 @Profile("provision")
@@ -22,7 +21,8 @@ class AccountProvisioningCommand implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         Console console = System.console();
         if (console == null) {
-            throw new IllegalStateException("Account provisioning requires an interactive terminal. Run the packaged JAR directly.");
+            throw new IllegalStateException(
+                    "Account provisioning requires an interactive terminal. Run the packaged JAR directly.");
         }
         String slotInput = console.readLine("Account slot (FIRST or SECOND): ");
         if (slotInput == null) {
@@ -40,8 +40,11 @@ class AccountProvisioningCommand implements ApplicationRunner {
         try {
             password = console.readPassword("Password (15–128 characters): ");
             confirmation = console.readPassword("Confirm password: ");
-            if (password == null || confirmation == null || !Arrays.equals(password, confirmation)) {
-                throw new IllegalArgumentException("Passwords did not match or provisioning was cancelled.");
+            if (password == null
+                    || confirmation == null
+                    || !Arrays.equals(password, confirmation)) {
+                throw new IllegalArgumentException(
+                        "Passwords did not match or provisioning was cancelled.");
             }
             AccountSummary account = accounts.provision(username, slot, password);
             console.printf("Created account %s in slot %s.%n", account.username(), account.slot());

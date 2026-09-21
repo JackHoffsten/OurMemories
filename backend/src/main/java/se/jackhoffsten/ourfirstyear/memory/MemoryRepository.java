@@ -1,8 +1,6 @@
 package se.jackhoffsten.ourfirstyear.memory;
 
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.UUID;
-
-interface MemoryRepository extends JpaRepository<Memory, UUID> {
-}
+interface MemoryRepository extends JpaRepository<Memory, UUID> {}

@@ -1,7 +1,6 @@
 package se.jackhoffsten.ourfirstyear.memory;
 
 import jakarta.persistence.*;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -31,10 +30,9 @@ class Memory {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    @Version
-    private long version;
+    @Version private long version;
 
-    protected Memory() { }
+    protected Memory() {}
 
     Memory(MemoryRequest request) {
         replace(request);
@@ -45,8 +43,10 @@ class Memory {
         title = request.title().strip();
         story = request.story().strip();
         memoryDate = request.memoryDate();
-        locationName = request.locationName() == null || request.locationName().isBlank()
-                ? null : request.locationName().strip();
+        locationName =
+                request.locationName() == null || request.locationName().isBlank()
+                        ? null
+                        : request.locationName().strip();
         updatedAt = Instant.now();
     }
 
@@ -55,6 +55,7 @@ class Memory {
     }
 
     MemoryResponse toResponse() {
-        return new MemoryResponse(id, title, story, memoryDate, locationName, createdAt, updatedAt, version);
+        return new MemoryResponse(
+                id, title, story, memoryDate, locationName, createdAt, updatedAt, version);
     }
 }
