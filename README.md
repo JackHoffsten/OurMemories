@@ -20,7 +20,7 @@ A private digital time capsule for a couple's shared memories, photos, and lette
 
 ## Status
 
-The backend supports PostgreSQL connectivity, Flyway migrations, terminal-based account provisioning, session authentication with CSRF protection, and shared memory management. The frontend remains a welcome page. Login rate limiting and photo uploads are not implemented yet; the application is intended for local development at this stage.
+The application supports private sign-in, a shared timeline, and creating, editing, and deleting memories. The backend uses PostgreSQL, Flyway, and session authentication with CSRF protection. Login rate limiting and photo uploads are not implemented yet; the application is intended for local development at this stage.
 
 ## Local database
 
@@ -74,7 +74,7 @@ Choose `FIRST` or `SECOND`, enter a username, and enter the password twice. Pass
 
 Each slot can hold one account; neither slot grants additional permissions. Duplicate usernames and occupied slots are rejected. The database enforces the same two-account limit. Passwords are stored as salted Argon2id hashes.
 
-The command exits after provisioning and does not start a web server. There is no registration endpoint. Provisioned accounts can authenticate through the API; the login interface is not implemented yet.
+The command exits after provisioning and does not start a web server. There is no registration endpoint. Provisioned accounts can sign in through the website.
 
 ## Authentication API
 
@@ -124,18 +124,45 @@ npm.cmd ci
 npm.cmd run dev
 ```
 
-Open the local URL printed by Vite (normally `http://localhost:5173`). The frontend currently displays a welcome page and does not call the backend.
+Keep the backend running with its `local` profile in a separate terminal. Open the local URL printed by Vite (normally `http://localhost:5173`) and sign in with a provisioned account. Vite forwards `/api` requests to `http://localhost:8080`, keeping browser requests on the same origin.
+
+Choose **Add a memory**, enter a title, date, story, and optional location, then save. The timeline shows 20 memories per page, newest first. Each memory has edit and delete controls; deletion requires confirmation. Conflicting edits preserve the current draft until you choose to reload the saved memory. Drafts stay in memory only and are lost on sign-out or session expiry; they are not saved to browser storage.
 
 ```powershell
 npm.cmd run lint
+npm.cmd test
 npm.cmd run build
 npm.cmd run preview
 ```
 
-The build checks TypeScript and creates production assets in `frontend/dist/`. The preview command serves those assets locally. On Linux or macOS, use `npm` instead of `npm.cmd`.
+The build checks TypeScript and creates production assets in `frontend/dist/`. Tests cover the login, timeline, editor, and CSRF client using fictional fixtures. The preview command serves production assets locally. Use the development server while working on the application. On Linux or macOS, use `npm` instead of `npm.cmd`.
+
+## Code style and theme
+
+The colour palette and fonts are defined in `frontend/src/theme.css`. Change its CSS variables to adjust the theme; component styles use those variables instead of individual colour values.
+
+From `frontend/`:
+
+```powershell
+npm.cmd run format
+npm.cmd run format:check
+npm.cmd run lint
+npm.cmd run lint:fix
+```
+
+Prettier formats TypeScript, JSX, CSS, and frontend configuration. Oxlint checks code quality and React rules; warnings fail the lint check. `.editorconfig` provides consistent indentation and line endings for supporting editors.
+
+From `backend/`, using JDK 25:
+
+```powershell
+.\mvnw.cmd spotless:apply
+.\mvnw.cmd spotless:check
+```
+
+Spotless formats Java with Google Java Format's four-space AOSP style. The normal Maven build checks Java formatting during `validate`; CI also checks frontend formatting. Formatting checks do not modify files.
 
 ## Continuous integration
 
-GitHub Actions runs on pull requests, pushes to `main`, and manual dispatch. The backend job uses Java 25 to validate the Compose configuration, run PostgreSQL integration tests through Testcontainers, and package the application. The frontend job uses Node.js 24 to install locked dependencies, lint, type-check, and build.
+GitHub Actions runs on pull requests, pushes to `main`, and manual dispatch. The backend job uses Java 25 to validate the Compose configuration, run PostgreSQL integration tests through Testcontainers, and package the application. The frontend job uses Node.js 24 to install locked dependencies, lint, test, type-check, and build.
 
 The jobs run independently and cache downloaded dependencies. No project secrets or development database are required. The workflow becomes active when this repository is hosted on GitHub with Actions enabled.
