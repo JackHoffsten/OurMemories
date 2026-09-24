@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import { api, ApiError, errorMessage } from '../api'
 import type { Memory, MemoryInput } from '../api'
 import { MemoryGallery } from './MemoryGallery'
+import './MemoryEditor.css';
 
 type Attachment = { file: File; preview: string }
 
@@ -69,10 +70,13 @@ export function MemoryEditor({
     setDirty(true)
     setError('')
   }
+
   const heading = useRef<HTMLHeadingElement>(null)
+
   useEffect(() => {
     heading.current?.focus()
   }, [])
+
   useEffect(() => {
     if (!dirty) return
     const warn = (event: BeforeUnloadEvent) => {
@@ -86,6 +90,7 @@ export function MemoryEditor({
     setDirty(true)
     setDraft((previous) => ({ ...previous, [field]: value }))
   }
+
   async function submit(event: FormEvent) {
     event.preventDefault()
     setBusy(true)
@@ -95,11 +100,17 @@ export function MemoryEditor({
       const result = await api.save(draft, current)
       setCurrent(result)
       saved = true
-      for (const attachment of [...pending.current]) {
+
+      const toUpload = [...pending.current]
+      for (const attachment of toUpload) {
         await api.uploadImage(result.id, attachment.file)
         replaceAttachments(pending.current.filter((item) => item !== attachment))
+      }
+
+      if (toUpload.length > 0) {
         setImageRevision((value) => value + 1)
       }
+
       setDirty(false)
       onSaved()
     } catch (cause) {
@@ -115,6 +126,7 @@ export function MemoryEditor({
       setBusy(false)
     }
   }
+
   async function reload() {
     if (
       !current ||
@@ -223,7 +235,7 @@ export function MemoryEditor({
             />
           )}
           {attachments.length > 0 && (
-            <ul className="memory-gallery" aria-label="Bilder att spara">
+            <ul className="pending-gallery" aria-label="Bilder att spara">
               {attachments.map((item) => (
                 <li key={item.preview}>
                   <img src={item.preview} alt={`Förhandsvisning av ${item.file.name}`} />

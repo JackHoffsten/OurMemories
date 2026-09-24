@@ -117,10 +117,9 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
             {data.items.length === 0 ? (
               <div className="empty-state">
                 <span aria-hidden="true">♡</span>
-                <h2>Vi börjar med ett minne.</h2>
-                <p>Spara en stund som du vill kunna återvända till.</p>
+                <h2>Lägg till ett minne</h2>
                 <button className="secondary" onClick={() => setEditor('new')}>
-                  Spara vårt första minne
+                  Lägg till vårt första minne
                 </button>
               </div>
             ) : (
