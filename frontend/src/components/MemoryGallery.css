@@ -2,7 +2,7 @@
   margin: 1.2rem 0;
   display: flex;
   align-items: center;
-  gap: 0.5rem;              /* replaces the inline marginLeft/Right */
+  gap: 0.25rem;              /* replaces the inline marginLeft/Right */
 }
 
 .memory-gallery {
@@ -87,4 +87,20 @@
 .gallery-arrow:disabled {
   opacity: 0.2;
   cursor: default;
+}
+
+@media (max-width: 640px) {
+  .gallery-arrow {
+    width: 1.5rem;
+    height: 1.5rem;
+    background: none;
+  }
+  .gallery-arrow:focus-visible {
+    outline: none; 
+    outline-offset: 0;
+  }
+  .gallery-arrow:hover:not(:disabled) {
+    opacity: 1;
+    background: none;
+  }
 }
