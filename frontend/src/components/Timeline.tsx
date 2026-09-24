@@ -2,15 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { api, ApiError, errorMessage } from '../api'
 import type { Memory, MemoryPage } from '../api'
 import { MemoryEditor } from './MemoryEditor'
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('sv-SE', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(`${value}T00:00:00Z`))
-}
+import { MemoryCard } from './MemoryCard'
 
 export function Timeline({ onExpired }: { onExpired: () => void }) {
   const [page, setPage] = useState(0)
@@ -135,48 +127,16 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
               <ol className="memory-list">
                 {data.items.map((memory) => (
                   <li key={memory.id}>
-                    <time dateTime={memory.memoryDate}>{formatDate(memory.memoryDate)}</time>
-                    <article className="memory-card" aria-labelledby={`memory-${memory.id}`}>
-                      {memory.locationName && <p className="location">{memory.locationName}</p>}
-                      <h2 id={`memory-${memory.id}`}>{memory.title}</h2>
-                      <p className="story">{memory.story}</p>
-                      {deleting === memory.id ? (
-                        <div className="delete-confirmation">
-                          <p>Vill du ta bort ”{memory.title}” för alltid?</p>
-                          <button
-                            className="danger"
-                            disabled={busy}
-                            onClick={() => void remove(memory)}
-                          >
-                            {busy ? 'Tar bort…' : 'Ja, ta bort minnet'}
-                          </button>
-                          <button
-                            className="text-button"
-                            disabled={busy}
-                            onClick={() => setDeleting(null)}
-                          >
-                            Behåll minnet
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="card-actions">
-                          <button
-                            className="text-button"
-                            aria-label={`Redigera ${memory.title}`}
-                            onClick={() => setEditor(memory)}
-                          >
-                            Redigera minnet
-                          </button>
-                          <button
-                            className="text-button"
-                            aria-label={`Ta bort ${memory.title}`}
-                            onClick={() => setDeleting(memory.id)}
-                          >
-                            Ta bort
-                          </button>
-                        </div>
-                      )}
-                    </article>
+                    <MemoryCard
+                      memory={memory}
+                      deleting={deleting === memory.id}
+                      busy={busy}
+                      onEdit={() => setEditor(memory)}
+                      onDelete={() => setDeleting(memory.id)}
+                      onConfirmDelete={() => void remove(memory)}
+                      onCancelDelete={() => setDeleting(null)}
+                      onExpired={onExpired}
+                    />
                   </li>
                 ))}
               </ol>

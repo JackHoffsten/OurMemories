@@ -16,6 +16,9 @@ vi.mock('./api', async (importOriginal) => {
       memory: vi.fn(),
       save: vi.fn(),
       delete: vi.fn(),
+      images: vi.fn(),
+      uploadImage: vi.fn(),
+      deleteImage: vi.fn(),
     },
   }
 })
@@ -37,6 +40,7 @@ beforeEach(() => {
   vi.resetAllMocks()
   mocked.me.mockResolvedValue({ username: 'first.user' })
   mocked.memories.mockResolvedValue(page)
+  mocked.images.mockResolvedValue([])
 })
 afterEach(cleanup)
 
@@ -108,6 +112,49 @@ describe('our story', () => {
       ),
     )
     expect(mocked.save.mock.calls[0][1]?.version).toBe(2)
+  })
+
+  it('keeps failed attachments and retries using the saved memory', async () => {
+    vi.stubGlobal(
+      'URL',
+      Object.assign(URL, {
+        createObjectURL: vi.fn(() => 'blob:preview'),
+        revokeObjectURL: vi.fn(),
+      }),
+    )
+    mocked.memories.mockResolvedValue({ ...page, items: [], totalElements: 0, totalPages: 0 })
+    mocked.save.mockResolvedValue(memory)
+    mocked.uploadImage.mockRejectedValueOnce(new Error('Offline')).mockResolvedValueOnce({
+      id: 'photo',
+      contentType: 'image/png',
+      width: 4,
+      height: 3,
+      size: 100,
+    })
+    render(<App />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Spara vårt första minne' }))
+    fireEvent.change(screen.getByLabelText('Ge minnet en rubrik'), {
+      target: { value: memory.title },
+    })
+    fireEvent.change(screen.getByLabelText('När var det?'), {
+      target: { value: memory.memoryDate },
+    })
+    fireEvent.change(screen.getByLabelText('Berätta om minnet'), {
+      target: { value: memory.story },
+    })
+    const file = new File(['png'], 'walk.png', { type: 'image/png' })
+    fireEvent.change(screen.getByLabelText(/Bilder \(valfritt\)/), { target: { files: [file] } })
+    expect(screen.getByAltText('Förhandsvisning av walk.png')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Spara minnet' }))
+    expect((await screen.findByRole('alert')).textContent).toContain('Minnet har sparats')
+    expect(screen.getByAltText('Förhandsvisning av walk.png')).toBeTruthy()
+    mocked.memories.mockResolvedValue(page)
+    fireEvent.click(screen.getByRole('button', { name: 'Spara minnet' }))
+    expect(await screen.findByRole('heading', { name: memory.title })).toBeTruthy()
+    expect(mocked.save.mock.calls[1][1]).toEqual(memory)
+    expect(mocked.uploadImage).toHaveBeenLastCalledWith(memory.id, file)
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview')
+    vi.unstubAllGlobals()
   })
 
   it('requires confirmation to delete and refreshes the list', async () => {

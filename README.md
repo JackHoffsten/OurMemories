@@ -1,4 +1,4 @@
-# Our First Year
+# OurMemories
 
 A private digital time capsule for a couple's shared memories, photos, and letters.
 
@@ -20,7 +20,7 @@ A private digital time capsule for a couple's shared memories, photos, and lette
 
 ## Status
 
-The application supports private sign-in, a shared timeline, and creating, editing, and deleting memories. The backend uses PostgreSQL, Flyway, and session authentication with CSRF protection. Login rate limiting and photo uploads are not implemented yet; the application is intended for local development at this stage.
+The application supports private sign-in, a shared timeline, and creating, editing, and deleting memories with private images. The backend uses PostgreSQL, Flyway, and session authentication with CSRF protection. Login rate limiting is not implemented yet; the application is intended for local development at this stage.
 
 ## Local database
 
@@ -67,7 +67,7 @@ Flyway applies versioned SQL migrations at startup. The first migration creates 
 Build the backend, then run this from `backend/` in an interactive terminal with JDK 25:
 
 ```powershell
-java -jar target/our-first-year-0.0.1-SNAPSHOT.jar --provision-account --spring.profiles.active=local
+java -jar target/our-memories-0.0.1-SNAPSHOT.jar --provision-account --spring.profiles.active=local
 ```
 
 Choose `FIRST` or `SECOND`, enter a username, and enter the password twice. Password input is hidden and is never passed as a command-line argument. Usernames are case-insensitive, 3–32 characters, and allow letters, digits, dots, underscores, and hyphens, starting with a letter or digit. Passwords must be 15–128 characters.
@@ -115,6 +115,17 @@ Titles are required and limited to 120 characters; stories are required and limi
 
 Invalid input returns HTTP 400 and missing memories return HTTP 404. Error bodies use the Problem Details format. The integration tests exercise both accounts sharing memories, pagination, validation, conflicting edits, and authentication/CSRF requirements against disposable PostgreSQL databases.
 
+## Memory images
+
+Both accounts can view and manage images. All endpoints require authentication; uploads and deletions also require CSRF protection.
+
+- `GET /api/memories/{id}/images` lists image metadata in upload order.
+- `POST /api/memories/{id}/images` accepts a multipart `file` and returns HTTP 201 with image metadata.
+- `GET /api/memories/{id}/images/{imageId}/content` serves the private image with `Cache-Control: no-store`.
+- `DELETE /api/memories/{id}/images/{imageId}` permanently removes an image.
+
+Each memory supports 10 JPEG or PNG images, up to 10 MiB and 20 million pixels each. The server checks the actual image format and re-encodes decoded pixels to discard metadata. SVG, GIF, and HEIC are not supported. Images are stored in PostgreSQL alongside the memories, so database backups include them. Deleting a memory deletes its images too.
+
 ## Frontend
 
 Requires Node.js 24 LTS and npm. From `frontend/` on Windows:
@@ -126,7 +137,9 @@ npm.cmd run dev
 
 Keep the backend running with its `local` profile in a separate terminal. Open the local URL printed by Vite (normally `http://localhost:5173`) and sign in with a provisioned account. Vite forwards `/api` requests to `http://localhost:8080`, keeping browser requests on the same origin.
 
-Choose **Add a memory**, enter a title, date, story, and optional location, then save. The timeline shows 20 memories per page, newest first. Each memory has edit and delete controls; deletion requires confirmation. Conflicting edits preserve the current draft until you choose to reload the saved memory. Drafts stay in memory only and are lost on sign-out or session expiry; they are not saved to browser storage.
+Choose **Lägg till ett minne**, enter a title, date, story, and optional location and images, then save. Selected images have previews and can be removed before saving. Existing images can be opened at full size or permanently deleted after confirmation in the editor. Image deletions take effect immediately. If an upload fails, the saved memory and successful uploads remain; the editor keeps the remaining attachments for another attempt.
+
+The timeline shows 20 memories per page, newest first. Each memory has edit and delete controls; deletion requires confirmation. Conflicting edits preserve the current draft until you choose to reload the saved memory. Drafts stay in memory only and are lost on sign-out or session expiry; they are not saved to browser storage.
 
 ```powershell
 npm.cmd run lint

@@ -9,9 +9,9 @@
     <relativePath/>
   </parent>
   <groupId>se.jackhoffsten</groupId>
-  <artifactId>our-first-year</artifactId>
+  <artifactId>our-memories</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>OurFirstYear</name>
+  <name>OurMemories</name>
   <description>Private digital time capsule</description>
   <properties>
     <java.version>25</java.version>

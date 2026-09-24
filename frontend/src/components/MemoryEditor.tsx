@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { api, ApiError, errorMessage } from '../api'
 import type { Memory, MemoryInput } from '../api'
+import { MemoryGallery } from './MemoryGallery'
+
+type Attachment = { file: File; preview: string }
 
 function content(memory: Memory): MemoryInput {
   return {
@@ -31,6 +34,41 @@ export function MemoryEditor({
   const [error, setError] = useState('')
   const [conflict, setConflict] = useState(false)
   const [dirty, setDirty] = useState(false)
+  const [attachments, setAttachments] = useState<Attachment[]>([])
+  const pending = useRef<Attachment[]>([])
+  const [imageRevision, setImageRevision] = useState(0)
+  useEffect(() => () => pending.current.forEach((item) => URL.revokeObjectURL(item.preview)), [])
+
+  function replaceAttachments(next: Attachment[]) {
+    pending.current
+      .filter((item) => !next.includes(item))
+      .forEach((item) => URL.revokeObjectURL(item.preview))
+    pending.current = next
+    setAttachments(next)
+  }
+
+  function attach(files: FileList | null) {
+    if (!files?.length) return
+    const selected = Array.from(files)
+    if (selected.some((file) => !['image/jpeg', 'image/png'].includes(file.type))) {
+      setError('Välj bilder i JPEG- eller PNG-format.')
+      return
+    }
+    if (selected.some((file) => file.size > 10 * 1024 * 1024)) {
+      setError('Varje bild får vara högst 10 MB.')
+      return
+    }
+    if (pending.current.length + selected.length > 10) {
+      setError('Välj högst 10 bilder åt gången.')
+      return
+    }
+    replaceAttachments([
+      ...pending.current,
+      ...selected.map((file) => ({ file, preview: URL.createObjectURL(file) })),
+    ])
+    setDirty(true)
+    setError('')
+  }
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => {
     heading.current?.focus()
@@ -52,14 +90,25 @@ export function MemoryEditor({
     event.preventDefault()
     setBusy(true)
     setError('')
+    let saved = false
     try {
-      await api.save(draft, current)
+      const result = await api.save(draft, current)
+      setCurrent(result)
+      saved = true
+      for (const attachment of [...pending.current]) {
+        await api.uploadImage(result.id, attachment.file)
+        replaceAttachments(pending.current.filter((item) => item !== attachment))
+        setImageRevision((value) => value + 1)
+      }
       setDirty(false)
       onSaved()
     } catch (cause) {
       if (cause instanceof ApiError && cause.status === 401) onExpired()
       else {
-        setError(errorMessage(cause))
+        setError(
+          (saved ? 'Minnet har sparats, men en bild kunde inte laddas upp. ' : '') +
+            errorMessage(cause),
+        )
         setConflict(cause instanceof ApiError && cause.status === 409)
       }
     } finally {
@@ -77,7 +126,7 @@ export function MemoryEditor({
       const latest = await api.memory(current.id)
       setCurrent(latest)
       setDraft(content(latest))
-      setDirty(false)
+      setDirty(pending.current.length > 0)
       setConflict(false)
       setError('')
     } catch (cause) {
@@ -146,6 +195,55 @@ export function MemoryEditor({
             value={draft.story}
             onChange={(event) => change('story', event.target.value)}
           />
+          <label htmlFor="images">
+            Bilder <span className="optional">(valfritt)</span>
+          </label>
+          <input
+            id="images"
+            type="file"
+            accept="image/jpeg,image/png"
+            multiple
+            aria-describedby="image-help"
+            onChange={(event) => {
+              attach(event.target.files)
+              event.target.value = ''
+            }}
+          />
+          <p id="image-help" className="image-help">
+            JPEG eller PNG. Högst 10 MB per bild och 10 bilder per minne.
+          </p>
+          {current && (
+            <MemoryGallery
+              memoryId={current.id}
+              title={draft.title}
+              editable
+              disabled={busy}
+              revision={imageRevision}
+              onExpired={onExpired}
+            />
+          )}
+          {attachments.length > 0 && (
+            <ul className="memory-gallery" aria-label="Bilder att spara">
+              {attachments.map((item) => (
+                <li key={item.preview}>
+                  <img src={item.preview} alt={`Förhandsvisning av ${item.file.name}`} />
+                  <span className="pending-image-name">{item.file.name}</span>
+                  <button
+                    type="button"
+                    className="text-button"
+                    aria-label={`Ta bort ${item.file.name}`}
+                    onClick={() =>
+                      replaceAttachments(
+                        pending.current.filter((attachment) => attachment !== item),
+                      )
+                    }
+                  >
+                    Ta bort
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
           <div className="form-actions">
             <button className="primary" disabled={conflict}>
               {busy ? 'Sparar…' : 'Spara minnet'}

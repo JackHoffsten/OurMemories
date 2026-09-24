@@ -1,0 +1,33 @@
+.memory-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.8rem;
+  list-style: none;
+  padding: 0;
+  margin: 1.2rem 0;
+}
+
+.memory-gallery li {
+  min-width: 0;
+}
+.memory-gallery img {
+  display: block;
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 5px;
+  background: var(--color-shadow);
+}
+.memory-gallery a {
+  display: block;
+}
+.image-help {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+.pending-image-name {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+}

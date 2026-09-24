@@ -1,11 +1,11 @@
-name: our-first-year
+name: our-memories
 
 services:
   postgres:
     image: postgres:18.3-alpine
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-our_first_year}
-      POSTGRES_USER: ${POSTGRES_USER:-our_first_year}
+      POSTGRES_DB: ${POSTGRES_DB:-our_memories}
+      POSTGRES_USER: ${POSTGRES_USER:-our_memories}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     ports:
       - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
