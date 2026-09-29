@@ -33,9 +33,17 @@ export function MemoryCard({
         {dateFormatter.format(new Date(`${memory.memoryDate}T00:00:00Z`))}
       </time>
       <article className="memory-card" aria-labelledby={`memory-${memory.id}`}>
-        {memory.locationName && <p className="location">{memory.locationName}</p>}
-        <h2 id={`memory-${memory.id}`}>{memory.title}</h2>
-        <p className="story">{memory.story}</p>
+        {memory.locationName && (
+          <p className="location" title={memory.locationName}>
+            {memory.locationName}
+          </p>
+        )}
+        <h2 id={`memory-${memory.id}`} title={memory.title}>
+          {memory.title}
+        </h2>
+        <p className="story" title={memory.story}>
+          {memory.story}
+        </p>
         <MemoryGallery memoryId={memory.id} title={memory.title} onExpired={onExpired} />
         {deleting ? (
           <div className="delete-confirmation">
