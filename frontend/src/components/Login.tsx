@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { api, ApiError, errorMessage } from '../api'
+import { content } from '../config/content'
 import './Login.css'
 
 export function Login({ notice, onLogin }: { notice: string; onLogin: () => Promise<void> }) {
@@ -26,7 +27,7 @@ export function Login({ notice, onLogin }: { notice: string; onLogin: () => Prom
       setUnwrapped(false)
       setError(
         cause instanceof ApiError && cause.status === 401
-          ? 'Användarnamnet eller lösenordet är fel.'
+          ? content.login.invalidCredentials
           : errorMessage(cause),
       )
     } finally {
@@ -37,7 +38,7 @@ export function Login({ notice, onLogin }: { notice: string; onLogin: () => Prom
   return (
     <section className="gift-login" aria-labelledby="login-title">
       <div className="gift-introduction">
-        <h1 id="login-title">Logga in för att öppna ♡</h1>
+        <h1 id="login-title">{content.login.heading}</h1>
       </div>
       <div className={`gift-package${unwrapped ? ' is-unwrapped' : ''}`}>
         <div className="gift-ribbon" aria-hidden="true" />
@@ -66,7 +67,7 @@ export function Login({ notice, onLogin }: { notice: string; onLogin: () => Prom
           )}
           <form onSubmit={submit} aria-busy={busy}>
             <fieldset disabled={busy}>
-              <label htmlFor="username">Användarnamn</label>
+              <label htmlFor="username">{content.login.username}</label>
               <input
                 id="username"
                 name="username"
@@ -76,7 +77,7 @@ export function Login({ notice, onLogin }: { notice: string; onLogin: () => Prom
                 required
                 maxLength={32}
               />
-              <label htmlFor="password">Lösenord</label>
+              <label htmlFor="password">{content.login.password}</label>
               <input
                 id="password"
                 name="password"
@@ -86,7 +87,7 @@ export function Login({ notice, onLogin }: { notice: string; onLogin: () => Prom
                 maxLength={128}
               />
               <button className="primary" disabled={busy}>
-                {busy ? 'Öppnar…' : 'Öppna'}
+                {busy ? content.login.opening : content.login.open}
               </button>
             </fieldset>
           </form>

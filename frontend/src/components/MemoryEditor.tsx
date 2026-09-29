@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import { api, ApiError, errorMessage } from '../api'
 import type { Memory, MemoryInput } from '../api'
 import { MemoryGallery } from './MemoryGallery'
+import { content as siteContent } from '../config/content'
 import './MemoryEditor.css'
 
 type Attachment = { file: File; preview: string }
@@ -52,15 +53,15 @@ export function MemoryEditor({
     if (!files?.length) return
     const selected = Array.from(files)
     if (selected.some((file) => !['image/jpeg', 'image/png'].includes(file.type))) {
-      setError('Välj bilder i JPEG- eller PNG-format.')
+      setError(siteContent.editor.unsupportedImages)
       return
     }
     if (selected.some((file) => file.size > 10 * 1024 * 1024)) {
-      setError('Varje bild får vara högst 10 MB.')
+      setError(siteContent.editor.imageTooLarge)
       return
     }
     if (pending.current.length + selected.length > 10) {
-      setError('Välj högst 10 bilder åt gången.')
+      setError(siteContent.editor.tooManyImages)
       return
     }
     replaceAttachments([
@@ -116,10 +117,7 @@ export function MemoryEditor({
     } catch (cause) {
       if (cause instanceof ApiError && cause.status === 401) onExpired()
       else {
-        setError(
-          (saved ? 'Minnet har sparats, men en bild kunde inte laddas upp. ' : '') +
-            errorMessage(cause),
-        )
+        setError((saved ? siteContent.editor.uploadFailed : '') + errorMessage(cause))
         setConflict(cause instanceof ApiError && cause.status === 409)
       }
     } finally {
@@ -128,11 +126,7 @@ export function MemoryEditor({
   }
 
   async function reload() {
-    if (
-      !current ||
-      !window.confirm('Vill du ersätta ditt utkast med den senast sparade versionen?')
-    )
-      return
+    if (!current || !window.confirm(siteContent.editor.replaceDraft)) return
     setBusy(true)
     try {
       const latest = await api.memory(current.id)
@@ -152,9 +146,9 @@ export function MemoryEditor({
   return (
     <section className="editor" aria-labelledby="editor-title">
       <h1 id="editor-title" tabIndex={-1} ref={heading}>
-        {memory ? 'Några fler detaljer…' : 'Minns du när…'}
+        {memory ? siteContent.editor.editHeading : siteContent.editor.newHeading}
       </h1>
-      <p className="lede">Skriv ner det precis som du minns det.</p>
+      <p className="lede">{siteContent.editor.introduction}</p>
       {error && (
         <div className="notice" role="alert">
           {error}
@@ -162,12 +156,12 @@ export function MemoryEditor({
       )}
       {conflict && (
         <button type="button" className="secondary" disabled={busy} onClick={() => void reload()}>
-          Hämta sparad version
+          {siteContent.editor.reload}
         </button>
       )}
       <form onSubmit={submit}>
         <fieldset disabled={busy}>
-          <label htmlFor="title">Ge minnet en rubrik</label>
+          <label htmlFor="title">{siteContent.editor.title}</label>
           <input
             id="title"
             required
@@ -177,7 +171,7 @@ export function MemoryEditor({
           />
           <div className="form-row">
             <div>
-              <label htmlFor="memory-date">När var det?</label>
+              <label htmlFor="memory-date">{siteContent.editor.date}</label>
               <input
                 id="memory-date"
                 type="date"
@@ -188,7 +182,8 @@ export function MemoryEditor({
             </div>
             <div>
               <label htmlFor="location">
-                Var? <span className="optional">(valfritt)</span>
+                {siteContent.editor.location}{' '}
+                <span className="optional">{siteContent.editor.optional}</span>
               </label>
               <input
                 id="location"
@@ -198,7 +193,7 @@ export function MemoryEditor({
               />
             </div>
           </div>
-          <label htmlFor="story">Berätta om minnet</label>
+          <label htmlFor="story">{siteContent.editor.story}</label>
           <textarea
             id="story"
             required
@@ -208,7 +203,8 @@ export function MemoryEditor({
             onChange={(event) => change('story', event.target.value)}
           />
           <label htmlFor="images">
-            Bilder <span className="optional">(valfritt)</span>
+            {siteContent.editor.images}{' '}
+            <span className="optional">{siteContent.editor.optional}</span>
           </label>
           <input
             id="images"
@@ -222,7 +218,7 @@ export function MemoryEditor({
             }}
           />
           <p id="image-help" className="image-help">
-            JPEG eller PNG. Högst 10 MB per bild och 10 bilder per minne.
+            {siteContent.editor.imageHelp}
           </p>
           {current && (
             <MemoryGallery
@@ -235,22 +231,22 @@ export function MemoryEditor({
             />
           )}
           {attachments.length > 0 && (
-            <ul className="pending-gallery" aria-label="Bilder att spara">
+            <ul className="pending-gallery" aria-label={siteContent.editor.pendingImages}>
               {attachments.map((item) => (
                 <li key={item.preview}>
-                  <img src={item.preview} alt={`Förhandsvisning av ${item.file.name}`} />
+                  <img src={item.preview} alt={siteContent.editor.previewLabel(item.file.name)} />
                   <span className="pending-image-name">{item.file.name}</span>
                   <button
                     type="button"
                     className="text-button"
-                    aria-label={`Ta bort ${item.file.name}`}
+                    aria-label={siteContent.editor.removeLabel(item.file.name)}
                     onClick={() =>
                       replaceAttachments(
                         pending.current.filter((attachment) => attachment !== item),
                       )
                     }
                   >
-                    Ta bort
+                    {siteContent.editor.remove}
                   </button>
                 </li>
               ))}
@@ -258,16 +254,16 @@ export function MemoryEditor({
           )}
           <div className="form-actions">
             <button className="primary" disabled={conflict}>
-              {busy ? 'Sparar…' : 'Spara minnet'}
+              {busy ? siteContent.editor.saving : siteContent.editor.save}
             </button>
             <button
               type="button"
               className="text-button"
               onClick={() => {
-                if (!dirty || window.confirm('Vill du slänga dina osparade ändringar?')) onCancel()
+                if (!dirty || window.confirm(siteContent.editor.discardDraft)) onCancel()
               }}
             >
-              Avbryt
+              {siteContent.editor.cancel}
             </button>
           </div>
         </fieldset>

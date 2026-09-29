@@ -3,6 +3,7 @@ import { api, ApiError, errorMessage } from '../api'
 import type { Memory, MemoryPage } from '../api'
 import { MemoryEditor } from './MemoryEditor'
 import { MemoryCard } from './MemoryCard'
+import { content } from '../config/content'
 
 export function Timeline({ onExpired }: { onExpired: () => void }) {
   const [page, setPage] = useState(0)
@@ -48,7 +49,7 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
     try {
       await api.delete(memory.id)
       setDeleting(null)
-      setAnnouncement('Minnet har tagits bort.')
+      setAnnouncement(content.timeline.deleted)
       setRevision((value) => value + 1)
       addButton.current?.focus()
     } catch (cause) {
@@ -69,7 +70,7 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
           closeEditor()
           setPage(0)
           setRevision((value) => value + 1)
-          setAnnouncement('Minnet har sparats.')
+          setAnnouncement(content.timeline.saved)
         }}
       />
     )
@@ -79,14 +80,14 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
       <div className="timeline-heading">
         <div>
           <h1 id="timeline-title">
-            Våra minnen{' '}
+            {content.timeline.heading}{' '}
             <span className="hand-heart" aria-hidden="true">
               ♡
             </span>
           </h1>
         </div>
         <button className="primary" ref={addButton} onClick={() => setEditor('new')}>
-          + Lägg till ett minne
+          {content.timeline.add}
         </button>
       </div>
       <p className="sr-only" role="status">
@@ -96,13 +97,13 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
         <div className="notice" role="alert">
           {error}{' '}
           <button className="text-button" onClick={() => setRevision((value) => value + 1)}>
-            Försök igen
+            {content.timeline.retry}
           </button>
         </div>
       )}
       {loading ? (
         <p className="status" role="status">
-          Hämtar våra minnen…
+          {content.timeline.loading}
         </p>
       ) : (
         !error &&
@@ -110,16 +111,17 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
           <>
             <div className="timeline-meta">
               <span>
-                {data.totalElements} {data.totalElements === 1 ? 'sparat minne' : 'sparade minnen'}
+                {data.totalElements}{' '}
+                {data.totalElements === 1 ? content.timeline.savedOne : content.timeline.savedMany}
               </span>
-              <span>Nyaste först</span>
+              <span>{content.timeline.newestFirst}</span>
             </div>
             {data.items.length === 0 ? (
               <div className="empty-state">
                 <span aria-hidden="true">♡</span>
-                <h2>Lägg till ett minne</h2>
+                <h2>{content.timeline.emptyHeading}</h2>
                 <button className="secondary" onClick={() => setEditor('new')}>
-                  Lägg till vårt första minne
+                  {content.timeline.addFirst}
                 </button>
               </div>
             ) : (
@@ -141,23 +143,21 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
               </ol>
             )}
             {data.totalPages > 1 && (
-              <nav className="pagination" aria-label="Minnessidor">
+              <nav className="pagination" aria-label={content.timeline.pages}>
                 <button
                   className="secondary"
                   disabled={page === 0}
                   onClick={() => setPage((value) => value - 1)}
                 >
-                  Nyare minnen
+                  {content.timeline.newer}
                 </button>
-                <span>
-                  Sida {page + 1} av {data.totalPages}
-                </span>
+                <span>{content.timeline.page(page + 1, data.totalPages)}</span>
                 <button
                   className="secondary"
                   disabled={page + 1 >= data.totalPages}
                   onClick={() => setPage((value) => value + 1)}
                 >
-                  Äldre minnen
+                  {content.timeline.older}
                 </button>
               </nav>
             )}

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { api, ApiError, errorMessage } from './api'
 import { Login } from './components/Login'
 import { Timeline } from './components/Timeline'
+import { content } from './config/content'
 import './App.css'
 
 function App() {
@@ -30,7 +31,7 @@ function App() {
 
   const expired = useCallback(() => {
     setUser(null)
-    setError('Din session har gått ut. Logga in igen.')
+    setError(content.app.sessionExpired)
   }, [])
 
   return (
@@ -38,7 +39,7 @@ function App() {
       <main id="main">
         {checking ? (
           <p className="status" role="status">
-            Öppnar våra minnen…
+            {content.app.opening}
           </p>
         ) : user ? (
           <>
@@ -60,7 +61,7 @@ function App() {
         )}
       </main>
       <footer>
-        Jag älskar dig <span aria-hidden="true">♡</span>
+        {content.app.footer} <span aria-hidden="true">♡</span>
       </footer>
     </>
   )

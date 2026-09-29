@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import type { Memory } from '../api'
 import { MemoryGallery } from './MemoryGallery'
+import { content } from '../config/content'
 
 const dateFormatter = new Intl.DateTimeFormat('sv-SE', {
   day: 'numeric',
@@ -131,7 +132,7 @@ export function MemoryCard({
                 aria-expanded={storyExpanded}
                 onClick={() => setStoryExpanded((expanded) => !expanded)}
               >
-                {storyExpanded ? 'Visa mindre' : 'Läs mer'}
+                {storyExpanded ? content.memory.readLess : content.memory.readMore}
               </button>
             </>
           )}
@@ -139,29 +140,29 @@ export function MemoryCard({
         <MemoryGallery memoryId={memory.id} title={memory.title} onExpired={onExpired} />
         {deleting ? (
           <div className="delete-confirmation">
-            <p>Vill du ta bort ”{memory.title}” och alla dess bilder för alltid?</p>
+            <p>{content.memory.deleteQuestion(memory.title)}</p>
             <button className="danger" disabled={busy} onClick={onConfirmDelete}>
-              {busy ? 'Tar bort…' : 'Ja, ta bort minnet'}
+              {busy ? content.memory.deleting : content.memory.confirmDelete}
             </button>
             <button className="text-button" disabled={busy} onClick={onCancelDelete}>
-              Behåll minnet
+              {content.memory.keep}
             </button>
           </div>
         ) : (
           <div className="card-actions">
             <button
               className="text-button"
-              aria-label={`Redigera ${memory.title}`}
+              aria-label={content.memory.editLabel(memory.title)}
               onClick={onEdit}
             >
-              Redigera minnet
+              {content.memory.edit}
             </button>
             <button
               className="text-button"
-              aria-label={`Ta bort ${memory.title}`}
+              aria-label={content.memory.deleteLabel(memory.title)}
               onClick={onDelete}
             >
-              Ta bort
+              {content.memory.delete}
             </button>
           </div>
         )}

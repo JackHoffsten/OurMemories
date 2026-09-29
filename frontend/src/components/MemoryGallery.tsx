@@ -3,6 +3,7 @@ import { api, ApiError, errorMessage, imageUrl } from '../api'
 import type { MemoryImage } from '../api'
 import './MemoryGallery.css'
 import { ChevronIcon } from '../icons'
+import { content } from '../config/content'
 
 export function MemoryGallery({
   memoryId,
@@ -87,7 +88,7 @@ export function MemoryGallery({
   }
 
   async function remove(id: string) {
-    if (!window.confirm('Vill du ta bort bilden för alltid?')) return
+    if (!window.confirm(content.gallery.confirmRemove)) return
     setRemoving(id)
     try {
       await api.deleteImage(memoryId, id)
@@ -105,13 +106,13 @@ export function MemoryGallery({
     <>
       {error && (
         <p className="notice" role="alert">
-          Bilderna kunde inte visas. {error}{' '}
+          {content.gallery.loadFailed} {error}{' '}
           <button
             type="button"
             className="text-button"
             onClick={() => setRetry((value) => value + 1)}
           >
-            Försök igen
+            {content.gallery.retry}
           </button>
         </p>
       )}
@@ -124,19 +125,19 @@ export function MemoryGallery({
               className="gallery-arrow gallery-arrow--prev"
               onClick={() => goTo(current - 1)}
               disabled={current === 0}
-              aria-label="Föregående bild"
+              aria-label={content.gallery.previous}
             >
               <ChevronIcon direction="left" />
             </button>
           )}
-          <ul className="memory-gallery" ref={listRef} aria-label="Bilder till minnet">
+          <ul className="memory-gallery" ref={listRef} aria-label={content.gallery.imagesLabel}>
             {images.map((image, index) => (
               <li key={image.id}>
                 <a
                   href={imageUrl(memoryId, image.id)}
                   target="_blank"
                   rel="noreferrer"
-                  aria-label={`Öppna bild ${index + 1} till ${title}`}
+                  aria-label={content.gallery.openLabel(index + 1, title)}
                 >
                   <img
                     src={imageUrl(memoryId, image.id)}
@@ -153,9 +154,9 @@ export function MemoryGallery({
                     className="text-button"
                     disabled={disabled || removing !== null}
                     onClick={() => void remove(image.id)}
-                    aria-label={`Ta bort bild ${index + 1}`}
+                    aria-label={content.gallery.removeLabel(index + 1)}
                   >
-                    {removing === image.id ? 'Tar bort…' : 'Ta bort bild'}
+                    {removing === image.id ? content.gallery.removing : content.gallery.remove}
                   </button>
                 )}
               </li>
@@ -163,7 +164,7 @@ export function MemoryGallery({
           </ul>
           {images.length > 1 && (
             <p className="gallery-position" aria-live="polite" aria-atomic="true">
-              Bild {current + 1} av {images.length}
+              {content.gallery.position(current + 1, images.length)}
             </p>
           )}
           {images.length > 1 && (
@@ -172,7 +173,7 @@ export function MemoryGallery({
               className="gallery-arrow gallery-arrow--next"
               onClick={() => goTo(current + 1)}
               disabled={current === images.length - 1}
-              aria-label="Nästa bild"
+              aria-label={content.gallery.next}
             >
               <ChevronIcon direction="right" />
             </button>

@@ -1,3 +1,5 @@
+import { content } from './config/content'
+
 export interface Memory {
   id: string
   title: string
@@ -55,10 +57,7 @@ async function request<T>(path: string, options: RequestInit = {}, retry = true)
     })
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') throw error
-    throw new ApiError(
-      0,
-      'Det gick inte att nå servern. Kontrollera din anslutning och försök igen.',
-    )
+    throw new ApiError(0, content.errors.network)
   }
   if (response.status === 403 && mutation && retry) {
     csrf = undefined
@@ -66,17 +65,17 @@ async function request<T>(path: string, options: RequestInit = {}, retry = true)
   }
   if (!response.ok) {
     const messages: Record<number, string> = {
-      429: 'För många inloggningsförsök. Vänta en stund och försök igen.',
-      400: 'Kontrollera uppgifterna och försök igen.',
-      401: 'Din session har gått ut. Logga in igen.',
-      403: 'Det gick inte att verifiera din begäran. Försök igen.',
-      404: 'Det här minnet finns inte längre.',
-      413: 'Bilden är för stor. Välj en bild på högst 10 MB och 20 megapixlar.',
-      415: 'Välj en giltig JPEG- eller PNG-bild.',
-      422: 'Ett minne kan ha högst 10 bilder. Ta bort en bild innan du lägger till fler.',
-      409: 'Minnet har ändrats på annat håll. Ditt utkast finns kvar här. Hämta den sparade versionen innan du fortsätter redigera.',
+      429: content.errors.tooManyAttempts,
+      400: content.errors.invalidInput,
+      401: content.errors.sessionExpired,
+      403: content.errors.verification,
+      404: content.errors.missingMemory,
+      413: content.errors.imageTooLarge,
+      415: content.errors.invalidImage,
+      422: content.errors.imageLimit,
+      409: content.errors.conflict,
     }
-    throw new ApiError(response.status, messages[response.status] ?? 'Något gick fel. Försök igen.')
+    throw new ApiError(response.status, messages[response.status] ?? content.errors.generic)
   }
   return response.status === 204 ? (undefined as T) : (response.json() as Promise<T>)
 }
@@ -117,5 +116,5 @@ export const api = {
 }
 
 export function errorMessage(error: unknown) {
-  return error instanceof Error ? error.message : 'Något gick fel. Försök igen.'
+  return error instanceof Error ? error.message : content.errors.generic
 }
