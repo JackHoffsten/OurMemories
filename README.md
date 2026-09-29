@@ -20,7 +20,7 @@ A private digital time capsule for a couple's shared memories, photos, and lette
 
 ## Status
 
-The application supports private sign-in, a shared timeline, and creating, editing, and deleting memories with private images. The backend uses PostgreSQL, Flyway, and session authentication with CSRF protection. Login rate limiting is not implemented yet; the application is intended for local development at this stage.
+The application supports private sign-in, a shared timeline, and creating, editing, and deleting memories with private images. The backend uses PostgreSQL, Flyway, session authentication, CSRF protection, and login throttling. Production containers and Jenkins deployment configuration are included; server setup and live acceptance checks must be completed before launch.
 
 ## Local database
 
@@ -128,7 +128,7 @@ Each memory supports 10 JPEG or PNG images, up to 10 MiB and 20 million pixels e
 
 ## Frontend
 
-Requires Node.js 24 LTS and npm. From `frontend/` on Windows:
+Requires Node.js 24.21.0 LTS and npm. From `frontend/` on Windows:
 
 ```powershell
 npm.cmd ci
@@ -176,6 +176,6 @@ Spotless formats Java with Google Java Format's four-space AOSP style. The norma
 
 ## Continuous integration
 
-GitHub Actions runs on pull requests, pushes to `main`, and manual dispatch. The backend job uses Java 25 to validate the Compose configuration, run PostgreSQL integration tests through Testcontainers, and package the application. The frontend job uses Node.js 24 to install locked dependencies, lint, test, type-check, and build.
+GitHub Actions runs on pull requests, pushes to `main`, and manual dispatch. The backend job uses Java 25 to validate the Compose configuration, run PostgreSQL integration tests through Testcontainers, and package the application. The frontend job uses Node.js 24.21.0 to install locked dependencies, lint, test, type-check, and build.
 
 The jobs run independently and cache downloaded dependencies. No project secrets or development database are required. The workflow becomes active when this repository is hosted on GitHub with Actions enabled.
