@@ -1,51 +1,45 @@
 .memory-gallery-wrap {
-  margin: 1.2rem 0;
-  display: flex;
+  margin: 1.5rem 0 0;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  gap: 0.65rem;
   align-items: center;
-  gap: 0.25rem;
+  min-width: 0;
 }
-
 .memory-gallery {
+  grid-column: 1 / -1;
+  grid-row: 1;
   display: flex;
-  flex-wrap: nowrap;
-  gap: 0;
+  min-width: 0;
   list-style: none;
   padding: 0;
   margin: 0;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  border-radius: 12px;
+  background: var(--color-shadow);
 }
-
 .memory-gallery::-webkit-scrollbar {
   display: none;
 }
-
 .memory-gallery li {
   flex: 0 0 100%;
-  scroll-snap-align: center;
+  min-width: 0;
+  scroll-snap-align: start;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
-  min-width: 0;
-  height: 40vh;
-  min-height: 280px;
-  max-height: 520px;
 }
-
 .memory-gallery a {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  flex: 1 1 auto;
-  min-height: 0;
-  line-height: 0;
+  height: clamp(220px, 55vw, 420px);
+  padding: 0.5rem;
 }
-
 .memory-gallery img {
   display: block;
   max-width: 100%;
@@ -53,56 +47,40 @@
   width: auto;
   height: auto;
   object-fit: contain;
-  border-radius: 5px;
-  background: var(--color-shadow);
+  border-radius: 8px;
 }
-
 .gallery-arrow {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
+  grid-row: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
   padding: 0;
-  border: none;
+  border: 1px solid var(--color-border-green);
   border-radius: 50%;
-  background: transparent;
-  color: var(--color-text, #000);
-  cursor: pointer;
-  opacity: 0.7;
-  transition:
-    opacity 120ms ease,
-    background-color 120ms ease;
+  background: var(--color-paper);
+  color: var(--color-primary);
 }
-
-.gallery-arrow:hover:not(:disabled) {
-  opacity: 1;
-  background: var(--color-shadow);
+.gallery-arrow--prev {
+  grid-column: 1;
 }
-
-.gallery-arrow:focus-visible {
-  outline: 2px solid var(--color-accent, #3b82f6);
-  outline-offset: 2px;
+.gallery-arrow--next {
+  grid-column: 3;
 }
-
+.gallery-position {
+  grid-row: 2;
+  grid-column: 2;
+  margin: 0;
+  text-align: center;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
 .gallery-arrow:disabled {
-  opacity: 0.2;
-  cursor: default;
+  opacity: 0.35;
 }
-
-@media (max-width: 640px) {
-  .gallery-arrow {
-    width: 1.5rem;
-    height: 1.5rem;
-    background: none;
-  }
-  .gallery-arrow:focus-visible {
-    outline: none;
-    outline-offset: 0;
-  }
+@media (hover: hover) {
   .gallery-arrow:hover:not(:disabled) {
-    opacity: 1;
-    background: none;
+    background: var(--color-paper-pink);
   }
 }

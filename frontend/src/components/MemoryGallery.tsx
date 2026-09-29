@@ -26,6 +26,7 @@ export function MemoryGallery({
   const [position, setCurrent] = useState(0)
   const current = Math.max(0, Math.min(position, images.length - 1))
   const listRef = useRef<HTMLUListElement>(null)
+  const positionRef = useRef(0)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -53,6 +54,7 @@ export function MemoryGallery({
       const width = list.clientWidth
       if (width === 0) return
       const index = Math.round(list.scrollLeft / width)
+      positionRef.current = index
       setCurrent((prev) => (prev === index ? prev : index))
     }
     list.addEventListener('scroll', onScroll, { passive: true })
@@ -62,14 +64,26 @@ export function MemoryGallery({
   useEffect(() => {
     const list = listRef.current
     if (!list || images.length === 0) return
-    list.scrollTo({ left: current * list.clientWidth, behavior: 'auto' })
-  }, [images.length, current])
+    const align = () => {
+      const index = Math.min(positionRef.current, images.length - 1)
+      list.scrollTo({ left: index * list.clientWidth, behavior: 'instant' })
+    }
+    align()
+    const observer = new ResizeObserver(align)
+    observer.observe(list)
+    return () => observer.disconnect()
+  }, [images.length])
 
   function goTo(index: number) {
     const list = listRef.current
     if (!list) return
     const clamped = Math.max(0, Math.min(index, images.length - 1))
-    list.scrollTo({ left: clamped * list.clientWidth, behavior: 'smooth' })
+    list.scrollTo({
+      left: clamped * list.clientWidth,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'instant'
+        : 'smooth',
+    })
   }
 
   async function remove(id: string) {
@@ -147,6 +161,11 @@ export function MemoryGallery({
               </li>
             ))}
           </ul>
+          {images.length > 1 && (
+            <p className="gallery-position" aria-live="polite" aria-atomic="true">
+              Bild {current + 1} av {images.length}
+            </p>
+          )}
           {images.length > 1 && (
             <button
               type="button"
