@@ -26,7 +26,7 @@ import se.jackhoffsten.ourmemories.account.AccountSlot;
 @Testcontainers
 class AuthenticationTests {
     @Container @ServiceConnection
-    static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18.3-alpine");
+    static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18.6-alpine3.24");
 
     @Autowired MockMvc mvc;
     @Autowired AccountProvisioningService accounts;
