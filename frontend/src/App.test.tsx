@@ -60,6 +60,9 @@ describe('our story', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Öppna' }))
     expect(await screen.findByRole('heading', { name: memory.title })).toBeTruthy()
     expect(screen.getByText('10 januari 2026')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: memory.title })).toBeNull()
+    expect(screen.queryByRole('button', { name: memory.locationName! })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Läs mer' })).toBeNull()
   })
 
   it('creates a memory from the empty state', async () => {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import type { Memory } from '../api'
 import { MemoryGallery } from './MemoryGallery'
 
@@ -8,6 +8,70 @@ const dateFormatter = new Intl.DateTimeFormat('sv-SE', {
   year: 'numeric',
   timeZone: 'UTC',
 })
+
+function ExpandableText({
+  value,
+  className,
+  likelyOverflowing,
+}: {
+  value: string
+  className: string
+  likelyOverflowing: boolean
+}) {
+  const contentRef = useRef<HTMLSpanElement>(null)
+  const [expanded, setExpanded] = useState(false)
+  const [overflowing, setOverflowing] = useState(likelyOverflowing)
+
+  useLayoutEffect(() => {
+    const content = contentRef.current
+    if (!content || expanded) {
+      return
+    }
+
+    const measureOverflow = () => {
+      if (content.clientWidth === 0) {
+        return
+      }
+
+      setOverflowing(
+        content.scrollHeight > content.clientHeight + 1 ||
+          content.scrollWidth > content.clientWidth + 1,
+      )
+    }
+
+    measureOverflow()
+
+    if (typeof ResizeObserver === 'undefined') {
+      return
+    }
+
+    const observer = new ResizeObserver(measureOverflow)
+    observer.observe(content)
+    return () => observer.disconnect()
+  }, [expanded, overflowing, value])
+
+  const classes = `memory-text-toggle ${className}${expanded ? ' expanded' : ''}`
+  const content = (
+    <span ref={contentRef} className="memory-text-content">
+      {value}
+    </span>
+  )
+
+  if (!overflowing) {
+    return <span className={classes}>{content}</span>
+  }
+
+  return (
+    <button
+      className={classes}
+      type="button"
+      aria-expanded={expanded}
+      onClick={() => setExpanded((current) => !current)}
+    >
+      {content}
+    </button>
+  )
+}
 
 export function MemoryCard({
   memory,
@@ -28,8 +92,6 @@ export function MemoryCard({
   onCancelDelete: () => void
   onExpired: () => void
 }) {
-  const [titleExpanded, setTitleExpanded] = useState(false)
-  const [locationExpanded, setLocationExpanded] = useState(false)
   const [storyExpanded, setStoryExpanded] = useState(false)
   const storyPreview = Array.from(memory.story.replace(/\s+/g, ' ').trim())
   const longStory = storyPreview.length > 220 || memory.story.split('\n').length > 4
@@ -42,25 +104,19 @@ export function MemoryCard({
       <article className="memory-card" aria-labelledby={`memory-${memory.id}`}>
         {memory.locationName && (
           <p className="location">
-            <button
-              className={`memory-text-toggle location-text${locationExpanded ? ' expanded' : ''}`}
-              type="button"
-              aria-expanded={locationExpanded}
-              onClick={() => setLocationExpanded((expanded) => !expanded)}
-            >
-              <span className="memory-text-content">{memory.locationName}</span>
-            </button>
+            <ExpandableText
+              value={memory.locationName}
+              className="location-text"
+              likelyOverflowing={Array.from(memory.locationName).length > 36}
+            />
           </p>
         )}
         <h2 id={`memory-${memory.id}`}>
-          <button
-            className={`memory-text-toggle title-text${titleExpanded ? ' expanded' : ''}`}
-            type="button"
-            aria-expanded={titleExpanded}
-            onClick={() => setTitleExpanded((expanded) => !expanded)}
-          >
-            <span className="memory-text-content">{memory.title}</span>
-          </button>
+          <ExpandableText
+            value={memory.title}
+            className="title-text"
+            likelyOverflowing={Array.from(memory.title).length > 48}
+          />
         </h2>
         <p className={`story${storyExpanded ? ' expanded' : ''}`}>
           {longStory && !storyExpanded
