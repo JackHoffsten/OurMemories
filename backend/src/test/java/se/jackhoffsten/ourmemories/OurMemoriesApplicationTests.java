@@ -23,7 +23,7 @@ import se.jackhoffsten.ourmemories.account.AccountSlot;
 class OurMemoriesApplicationTests {
 
     @Container @ServiceConnection
-    static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18.3-alpine");
+    static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18.6-alpine3.24");
 
     private final Flyway flyway;
     private final JdbcTemplate jdbcTemplate;
@@ -49,7 +49,7 @@ class OurMemoriesApplicationTests {
                                 "SELECT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'capsule')",
                                 Boolean.class))
                 .isTrue();
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("4");
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("5");
         assertThat(flyway.info().pending()).isEmpty();
         assertThat(flyway.validateWithResult().validationSuccessful).isTrue();
     }

@@ -19,6 +19,14 @@ class SecurityConfiguration {
                 .authorizeHttpRequests(
                         authorize ->
                                 authorize
+                                        .requestMatchers(
+                                                request ->
+                                                        request.getLocalPort() == 9090
+                                                                && request.getRequestURI()
+                                                                        .equals("/actuator/health")
+                                                                && request.getMethod()
+                                                                        .equals("GET"))
+                                        .permitAll()
                                         .requestMatchers(HttpMethod.GET, "/api/auth/csrf")
                                         .permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/auth/login")
