@@ -193,19 +193,41 @@ footer span {
   transform: rotate(-5deg);
 }
 .location {
-  max-width: 100%;
   margin: 0;
   color: var(--color-text-muted);
   font-size: 0.8rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 .memory-card h2 {
+  margin-inline: 0;
   max-width: 100%;
+}
+.memory-text-toggle {
+  display: -webkit-box;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+  background: transparent;
+  border: 0;
+  -webkit-box-orient: vertical;
+}
+.title-text {
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+.location-text {
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+.memory-text-toggle.expanded {
+  display: block;
+  overflow: hidden;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
 }
 .story {
   max-width: 100%;
@@ -218,6 +240,14 @@ footer span {
   -webkit-line-clamp: 4;
   line-clamp: 4;
   overflow: hidden;
+}
+.story.expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+}
+.story-toggle {
+  padding: 0;
 }
 .card-actions {
   display: flex;

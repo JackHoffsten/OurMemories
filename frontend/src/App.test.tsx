@@ -193,7 +193,7 @@ describe('our story', () => {
     )
   })
 
-  it('shortens long memory text while retaining its accessible name', async () => {
+  it('expands long title, location, and story text', async () => {
     const longMemory = {
       ...memory,
       title: 'T'.repeat(70),
@@ -204,10 +204,21 @@ describe('our story', () => {
 
     render(<App />)
 
-    expect((await screen.findByRole('heading', { name: longMemory.title })).textContent).toBe(
-      `${'T'.repeat(48)}…`,
-    )
-    expect(screen.getByLabelText(longMemory.locationName).textContent).toBe(`${'L'.repeat(60)}…`)
-    expect(screen.getByLabelText(longMemory.story).textContent).toBe(`${'S'.repeat(220)}…`)
+    await screen.findByRole('heading', { name: longMemory.title })
+    const title = screen.getByRole('button', { name: longMemory.title })
+    const location = screen.getByRole('button', { name: longMemory.locationName })
+    const story = screen.getByText(longMemory.story)
+    expect(title.getAttribute('aria-expanded')).toBe('false')
+    expect(location.getAttribute('aria-expanded')).toBe('false')
+    expect(story.className).toBe('story')
+
+    fireEvent.click(title)
+    fireEvent.click(location)
+    fireEvent.click(screen.getByRole('button', { name: 'Läs mer' }))
+
+    expect(title.getAttribute('aria-expanded')).toBe('true')
+    expect(location.getAttribute('aria-expanded')).toBe('true')
+    expect(story.className).toBe('story expanded')
+    expect(screen.getByRole('button', { name: 'Visa mindre' })).toBeTruthy()
   })
 })

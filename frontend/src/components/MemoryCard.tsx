@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { Memory } from '../api'
 import { MemoryGallery } from './MemoryGallery'
 
@@ -7,10 +8,6 @@ const dateFormatter = new Intl.DateTimeFormat('sv-SE', {
   year: 'numeric',
   timeZone: 'UTC',
 })
-
-function truncate(value: string, maximumLength: number) {
-  return value.length <= maximumLength ? value : `${value.slice(0, maximumLength).trimEnd()}…`
-}
 
 export function MemoryCard({
   memory,
@@ -31,6 +28,13 @@ export function MemoryCard({
   onCancelDelete: () => void
   onExpired: () => void
 }) {
+  const [titleExpanded, setTitleExpanded] = useState(false)
+  const [locationExpanded, setLocationExpanded] = useState(false)
+  const [storyExpanded, setStoryExpanded] = useState(false)
+  const longTitle = memory.title.length > 48
+  const longLocation = (memory.locationName?.length ?? 0) > 36
+  const longStory = memory.story.length > 180 || memory.story.split('\n').length > 4
+
   return (
     <>
       <time dateTime={memory.memoryDate}>
@@ -38,16 +42,35 @@ export function MemoryCard({
       </time>
       <article className="memory-card" aria-labelledby={`memory-${memory.id}`}>
         {memory.locationName && (
-          <p className="location" title={memory.locationName} aria-label={memory.locationName}>
-            {truncate(memory.locationName, 60)}
+          <p className="location">
+            <button
+              className={`memory-text-toggle location-text${locationExpanded ? ' expanded' : ''}`}
+              aria-expanded={longLocation ? locationExpanded : undefined}
+              onClick={() => longLocation && setLocationExpanded((expanded) => !expanded)}
+            >
+              {memory.locationName}
+            </button>
           </p>
         )}
-        <h2 id={`memory-${memory.id}`} title={memory.title} aria-label={memory.title}>
-          {truncate(memory.title, 48)}
+        <h2 id={`memory-${memory.id}`}>
+          <button
+            className={`memory-text-toggle title-text${titleExpanded ? ' expanded' : ''}`}
+            aria-expanded={longTitle ? titleExpanded : undefined}
+            onClick={() => longTitle && setTitleExpanded((expanded) => !expanded)}
+          >
+            {memory.title}
+          </button>
         </h2>
-        <p className="story" title={memory.story} aria-label={memory.story}>
-          {truncate(memory.story, 220)}
-        </p>
+        <p className={`story${storyExpanded ? ' expanded' : ''}`}>{memory.story}</p>
+        {longStory && (
+          <button
+            className="text-button story-toggle"
+            aria-expanded={storyExpanded}
+            onClick={() => setStoryExpanded((expanded) => !expanded)}
+          >
+            {storyExpanded ? 'Visa mindre' : 'Läs mer'}
+          </button>
+        )}
         <MemoryGallery memoryId={memory.id} title={memory.title} onExpired={onExpired} />
         {deleting ? (
           <div className="delete-confirmation">
