@@ -8,6 +8,10 @@ const dateFormatter = new Intl.DateTimeFormat('sv-SE', {
   timeZone: 'UTC',
 })
 
+function truncate(value: string, maximumLength: number) {
+  return value.length <= maximumLength ? value : `${value.slice(0, maximumLength).trimEnd()}…`
+}
+
 export function MemoryCard({
   memory,
   deleting,
@@ -34,15 +38,15 @@ export function MemoryCard({
       </time>
       <article className="memory-card" aria-labelledby={`memory-${memory.id}`}>
         {memory.locationName && (
-          <p className="location" title={memory.locationName}>
-            {memory.locationName}
+          <p className="location" title={memory.locationName} aria-label={memory.locationName}>
+            {truncate(memory.locationName, 60)}
           </p>
         )}
-        <h2 id={`memory-${memory.id}`} title={memory.title}>
-          {memory.title}
+        <h2 id={`memory-${memory.id}`} title={memory.title} aria-label={memory.title}>
+          {truncate(memory.title, 48)}
         </h2>
-        <p className="story" title={memory.story}>
-          {memory.story}
+        <p className="story" title={memory.story} aria-label={memory.story}>
+          {truncate(memory.story, 220)}
         </p>
         <MemoryGallery memoryId={memory.id} title={memory.title} onExpired={onExpired} />
         {deleting ? (

@@ -192,4 +192,22 @@ describe('our story', () => {
       expect(mocked.memories).toHaveBeenLastCalledWith(1, expect.any(AbortSignal)),
     )
   })
+
+  it('shortens long memory text while retaining its accessible name', async () => {
+    const longMemory = {
+      ...memory,
+      title: 'T'.repeat(70),
+      locationName: 'L'.repeat(80),
+      story: 'S'.repeat(250),
+    }
+    mocked.memories.mockResolvedValue({ ...page, items: [longMemory] })
+
+    render(<App />)
+
+    expect((await screen.findByRole('heading', { name: longMemory.title })).textContent).toBe(
+      `${'T'.repeat(48)}…`,
+    )
+    expect(screen.getByLabelText(longMemory.locationName).textContent).toBe(`${'L'.repeat(60)}…`)
+    expect(screen.getByLabelText(longMemory.story).textContent).toBe(`${'S'.repeat(220)}…`)
+  })
 })
