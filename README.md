@@ -70,7 +70,7 @@ Build the backend, then run this from `backend/` in an interactive terminal with
 java -jar target/our-memories-0.0.1-SNAPSHOT.jar --provision-account --spring.profiles.active=local
 ```
 
-Choose `FIRST` or `SECOND`, enter a username, and enter the password twice. Password input is hidden and is never passed as a command-line argument. Usernames are case-insensitive, 3–32 characters, and allow letters, digits, dots, underscores, and hyphens, starting with a letter or digit. Passwords must be 15–128 characters.
+Choose `FIRST` or `SECOND`, enter a username, and enter the password twice. Password input is hidden and is never passed as a command-line argument. Usernames are case-insensitive, 3–32 characters, and allow letters, digits, dots, underscores, and hyphens, starting with a letter or digit. Passwords must be 12–128 characters.
 
 Each slot can hold one account; neither slot grants additional permissions. Duplicate usernames and occupied slots are rejected. The database enforces the same two-account limit. Passwords are stored as salted Argon2id hashes.
 

@@ -28,8 +28,8 @@ public class AccountProvisioningService {
         if (slot == null) {
             throw new IllegalArgumentException("Choose the FIRST or SECOND account slot.");
         }
-        if (password == null || password.length < 15 || password.length > 128) {
-            throw new IllegalArgumentException("Password must contain 15–128 characters.");
+        if (password == null || password.length < 12 || password.length > 128) {
+            throw new IllegalArgumentException("Password must contain 12–128 characters.");
         }
         if (accounts.existsByUsername(normalizedUsername) || accounts.existsBySlot(slot)) {
             throw new IllegalStateException("Username or account slot already exists.");

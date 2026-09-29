@@ -38,7 +38,7 @@ class AccountProvisioningCommand implements ApplicationRunner {
         char[] password = null;
         char[] confirmation = null;
         try {
-            password = console.readPassword("Password (15–128 characters): ");
+            password = console.readPassword("Password (12–128 characters): ");
             confirmation = console.readPassword("Confirm password: ");
             if (password == null
                     || confirmation == null

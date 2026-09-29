@@ -62,7 +62,7 @@ class OurMemoriesApplicationTests {
     @Test
     @Transactional
     void provisionsAccountsWithDistinctSaltedPasswordHashes() {
-        String password = "a long test passphrase";
+        String password = "x".repeat(12);
         var first = accounts.provision(" First.User ", AccountSlot.FIRST, password.toCharArray());
         var second = accounts.provision("second.user", AccountSlot.SECOND, password.toCharArray());
         assertThat(first.username()).isEqualTo("first.user");
@@ -110,7 +110,7 @@ class OurMemoriesApplicationTests {
     @Test
     @Transactional
     void rejectsInvalidProvisioningInput() {
-        for (String password : new String[] {"", "x".repeat(14), "x".repeat(129)}) {
+        for (String password : new String[] {"", "x".repeat(11), "x".repeat(129)}) {
             assertThatThrownBy(
                             () ->
                                     accounts.provision(
