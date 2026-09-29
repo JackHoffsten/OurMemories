@@ -201,33 +201,44 @@ footer span {
   margin-inline: 0;
   max-width: 100%;
 }
-.memory-text-toggle {
-  display: -webkit-box;
-  width: 100%;
-  max-width: 100%;
+.memory-text-toggle,
+.story-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 0;
+  min-width: 0;
   padding: 0;
-  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   color: inherit;
   font: inherit;
   text-align: left;
-  overflow-wrap: anywhere;
-  background: transparent;
-  border: 0;
-  -webkit-box-orient: vertical;
 }
-.title-text {
+.memory-text-toggle {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  line-height: inherit;
+}
+.memory-text-content {
+  display: block;
+  color: inherit;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.title-text:not(.expanded) .memory-text-content {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   line-clamp: 3;
+  max-height: 4.2em;
 }
-.location-text {
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-}
-.memory-text-toggle.expanded {
-  display: block;
-  overflow: hidden;
-  -webkit-line-clamp: unset;
-  line-clamp: unset;
+.location-text:not(.expanded) .memory-text-content {
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .story {
   max-width: 100%;
@@ -235,19 +246,14 @@ footer span {
   line-height: 1.85;
   font-style: italic;
   white-space: pre-wrap;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
-  line-clamp: 4;
-  overflow: hidden;
-}
-.story.expanded {
-  display: block;
-  -webkit-line-clamp: unset;
-  line-clamp: unset;
+  overflow-wrap: anywhere;
 }
 .story-toggle {
-  padding: 0;
+  display: inline;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 .card-actions {
   display: flex;
@@ -328,7 +334,7 @@ footer span {
     margin-top: 0.5rem;
   }
   .memory-list > li {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
   }
   .memory-list time {
@@ -338,7 +344,7 @@ footer span {
     padding: 0.75rem;
   }
   .form-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0;
   }
   .editor form {
