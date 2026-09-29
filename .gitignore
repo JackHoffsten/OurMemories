@@ -15,6 +15,10 @@
 *.dump
 *.sql.gz
 *.backup
+*.age
+__pycache__/
+.dev/
+/deploy/README.md
 
 target/
 *.class

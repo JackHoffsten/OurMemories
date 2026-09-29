@@ -1,0 +1,39 @@
+{
+	admin off
+}
+
+:80 {
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+		X-Frame-Options DENY
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		-Server
+	}
+	@api path /api /api/*
+	handle @api {
+		request_body {
+			max_size 11MB
+		}
+		reverse_proxy backend:8080 {
+			header_up -Forwarded
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Host our-memories.jackhoffsten.se
+		}
+	}
+	handle /actuator* {
+		respond 404
+	}
+	handle {
+		root * /srv
+		encode zstd gzip
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+		route {
+			try_files {path} /index.html
+			header /index.html Cache-Control "no-cache"
+			file_server
+		}
+	}
+}
