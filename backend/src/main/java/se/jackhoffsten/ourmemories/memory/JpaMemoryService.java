@@ -23,15 +23,18 @@ class JpaMemoryService implements MemoryService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Page must be nonnegative and size must be 1–100.");
         }
+
         if ((long) page * size > Integer.MAX_VALUE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page offset is too large.");
         }
+
         var result =
                 memories.findAll(
                         PageRequest.of(
                                 page, size, Sort.by(Sort.Direction.DESC, "memoryDate", "id")));
+
         return new MemoryPage(
-                result.getContent().stream().map(Memory::toResponse).toList(),
+                result.getContent().stream().map((Memory m) -> m.toResponse()).toList(),
                 page,
                 size,
                 result.getTotalElements(),

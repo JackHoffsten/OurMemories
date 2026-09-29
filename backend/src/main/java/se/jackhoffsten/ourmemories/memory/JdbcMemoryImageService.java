@@ -48,7 +48,7 @@ class JdbcMemoryImageService implements MemoryImageService {
                         memoryId)
                 >= 10) {
             throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY, "A memory can have at most 10 images.");
+                    HttpStatus.UNPROCESSABLE_CONTENT, "A memory can have at most 10 images.");
         }
         var image = normalizer.normalize(file);
         UUID id = UUID.randomUUID();

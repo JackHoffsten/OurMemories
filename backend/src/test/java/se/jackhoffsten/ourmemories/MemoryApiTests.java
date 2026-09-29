@@ -34,7 +34,7 @@ import tools.jackson.databind.ObjectMapper;
 @Testcontainers
 class MemoryApiTests {
     @Container @ServiceConnection
-    static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18.3-alpine");
+    static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:18.6-alpine3.24");
 
     @Autowired MockMvc mvc;
     @Autowired AccountProvisioningService accounts;
@@ -262,7 +262,7 @@ class MemoryApiTests {
                                 .file(new MockMultipartFile("file", new byte[10 * 1024 * 1024 + 1]))
                                 .session(session)
                                 .header("X-CSRF-TOKEN", csrf))
-                .andExpect(status().isPayloadTooLarge());
+                .andExpect(status().isContentTooLarge());
         String imageId = null;
         for (int index = 0; index < 10; index++) {
             String result =
@@ -278,7 +278,7 @@ class MemoryApiTests {
             imageId = JsonPath.read(result, "$.id");
         }
         mvc.perform(multipart(url).file(valid).session(session).header("X-CSRF-TOKEN", csrf))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isUnprocessableContent());
         mvc.perform(write(delete(url + "/" + imageId))).andExpect(status().isNoContent());
         mvc.perform(get(url + "/" + imageId + "/content").session(session))
                 .andExpect(status().isNotFound());
