@@ -19,4 +19,4 @@ export function ChevronIcon({ direction }: { direction: 'left' | 'right' }) {
       )}
     </svg>
   )
-};
+}

@@ -66,7 +66,7 @@ describe('our story', () => {
     mocked.memories.mockResolvedValue({ ...page, items: [], totalElements: 0, totalPages: 0 })
     mocked.save.mockResolvedValue(memory)
     render(<App />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Spara vårt första minne' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Lägg till vårt första minne' }))
     fireEvent.change(screen.getByLabelText('Ge minnet en rubrik'), {
       target: { value: 'Our first walk' },
     })
@@ -132,7 +132,7 @@ describe('our story', () => {
       size: 100,
     })
     render(<App />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Spara vårt första minne' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Lägg till vårt första minne' }))
     fireEvent.change(screen.getByLabelText('Ge minnet en rubrik'), {
       target: { value: memory.title },
     })
@@ -166,7 +166,7 @@ describe('our story', () => {
     fireEvent.click(screen.getByRole('button', { name: `Ta bort ${memory.title}` }))
     mocked.memories.mockResolvedValue({ ...page, items: [], totalElements: 0, totalPages: 0 })
     fireEvent.click(screen.getByRole('button', { name: 'Ja, ta bort minnet' }))
-    expect(await screen.findByRole('heading', { name: 'Vi börjar med ett minne.' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Lägg till ett minne' })).toBeTruthy()
     expect(mocked.delete).toHaveBeenCalledWith(memory.id)
   })
 

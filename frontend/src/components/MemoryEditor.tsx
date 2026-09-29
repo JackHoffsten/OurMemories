@@ -3,7 +3,7 @@ import type { FormEvent } from 'react'
 import { api, ApiError, errorMessage } from '../api'
 import type { Memory, MemoryInput } from '../api'
 import { MemoryGallery } from './MemoryGallery'
-import './MemoryEditor.css';
+import './MemoryEditor.css'
 
 type Attachment = { file: File; preview: string }
 

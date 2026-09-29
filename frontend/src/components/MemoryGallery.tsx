@@ -23,7 +23,8 @@ export function MemoryGallery({
   const [error, setError] = useState('')
   const [removing, setRemoving] = useState<string | null>(null)
   const [retry, setRetry] = useState(0)
-  const [current, setCurrent] = useState(0)
+  const [position, setCurrent] = useState(0)
+  const current = Math.max(0, Math.min(position, images.length - 1))
   const listRef = useRef<HTMLUListElement>(null)
 
   useEffect(() => {
@@ -56,14 +57,6 @@ export function MemoryGallery({
     }
     list.addEventListener('scroll', onScroll, { passive: true })
     return () => list.removeEventListener('scroll', onScroll)
-  }, [images.length])
-
-  useEffect(() => {
-    if (images.length === 0) {
-      setCurrent(0)
-      return
-    }
-    setCurrent((c) => Math.min(c, images.length - 1))
   }, [images.length])
 
   useEffect(() => {
@@ -122,11 +115,7 @@ export function MemoryGallery({
               <ChevronIcon direction="left" />
             </button>
           )}
-          <ul
-            className="memory-gallery"
-            ref={listRef}
-            aria-label="Bilder till minnet"
-          >
+          <ul className="memory-gallery" ref={listRef} aria-label="Bilder till minnet">
             {images.map((image, index) => (
               <li key={image.id}>
                 <a
