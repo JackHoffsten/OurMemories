@@ -6,13 +6,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 class SecurityConfiguration {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.authorizeHttpRequests(
+        return http.addFilterBefore(
+                        new LoginThrottleFilter(new LoginThrottle()),
+                        UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(
                         authorize ->
                                 authorize
                                         .requestMatchers(HttpMethod.GET, "/api/auth/csrf")

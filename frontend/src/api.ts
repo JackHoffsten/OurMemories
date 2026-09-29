@@ -66,6 +66,7 @@ async function request<T>(path: string, options: RequestInit = {}, retry = true)
   }
   if (!response.ok) {
     const messages: Record<number, string> = {
+      429: 'För många inloggningsförsök. Vänta en stund och försök igen.',
       400: 'Kontrollera uppgifterna och försök igen.',
       401: 'Din session har gått ut. Logga in igen.',
       403: 'Det gick inte att verifiera din begäran. Försök igen.',
