@@ -1,0 +1,28 @@
+/* Edit these values to change the site's colors and fonts. */
+:root {
+  --color-favorite-pink: #ff59b3;
+  --color-favorite-green: #8dd44e;
+  --color-background: #f3fbe9;
+  --color-text: #2d4028;
+  --color-text-muted: #5d6d58;
+  --color-paper: #fff9fc;
+  --color-paper-pink: #ffd9eb;
+  --color-paper-pink-soft: #fff0f7;
+  --color-input: #fffdfa;
+  --color-border: #e8cbd9;
+  --color-border-green: #8dd44e;
+  --color-border-pink: #ed86bc;
+  --color-primary: #417816;
+  --color-primary-hover: #2f5d0d;
+  --color-on-primary: #ffffff;
+  --color-accent: #b61a6b;
+  --color-accent-text: #8f1455;
+  --color-shadow: #e4f0d7;
+  --color-button-shadow: #356a1426;
+  --color-tape-green: var(--color-favorite-green);
+  --color-tape-pink: var(--color-favorite-pink);
+  --color-ribbon: #ff59b3;
+  --shadow-card: 0 8px 32px #37621c18;
+  --font-body: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  --font-heading: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+}

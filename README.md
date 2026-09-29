@@ -18,6 +18,12 @@ A private digital time capsule for a couple's shared memories, photos, and lette
 - React, TypeScript, and Vite
 - Docker Compose and Caddy
 
+## Customize the website
+
+Edit [frontend/src/config/content.ts](frontend/src/config/content.ts) for the visible Swedish text, including headings, buttons, messages, and the browser title. Text with a changing memory title or number is a small function in that file.
+
+Edit [frontend/src/config/theme.css](frontend/src/config/theme.css) for colors and fonts. The two favorite colors are at the top. The darker `--color-primary` and `--color-accent` values are used where text needs more contrast; adjust those alongside the favorite colors if you change the palette. Fonts are controlled by `--font-body` and `--font-heading` near the bottom. Changes appear automatically in the local Vite development server. Production changes require a new frontend build and deployment.
+
 ## Status
 
 The application supports private sign-in, a shared timeline, and creating, editing, and deleting memories with private images. The backend uses PostgreSQL, Flyway, session authentication, CSRF protection, and login throttling. Production containers and Jenkins deployment configuration are included; server setup and live acceptance checks must be completed before launch.

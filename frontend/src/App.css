@@ -161,7 +161,7 @@ footer span {
   min-width: 0;
 }
 .memory-list time {
-  font: 0.95rem var(--font-handwritten);
+  font: 0.95rem var(--font-heading);
   padding-top: 1.8rem;
   color: var(--color-text-muted);
 }
@@ -184,13 +184,6 @@ footer span {
   width: 65px;
   background: var(--color-tape-pink);
   transform: rotate(5deg);
-}
-.memory-list > li:nth-child(even) .memory-card {
-  background: var(--color-paper-pink-soft);
-}
-.memory-list > li:nth-child(even) .memory-card::before {
-  background: var(--color-tape-green);
-  transform: rotate(-5deg);
 }
 .location {
   margin: 0;
@@ -382,9 +375,6 @@ footer span {
 }
 .memory-card::before {
   display: none;
-}
-.memory-list > li:nth-child(even) .memory-card {
-  background: var(--color-paper);
 }
 .location {
   color: var(--color-accent-text);

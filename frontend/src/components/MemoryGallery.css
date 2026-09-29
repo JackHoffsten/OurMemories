@@ -19,7 +19,7 @@
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   border-radius: 12px;
-  background: var(--color-shadow);
+  background: var(--color-paper-pink);
 }
 .memory-gallery::-webkit-scrollbar {
   display: none;
@@ -60,6 +60,7 @@
   border-radius: 50%;
   background: var(--color-paper);
   color: var(--color-primary);
+  transition: background-color 160ms ease;
 }
 .gallery-arrow--prev {
   grid-column: 1;
@@ -81,6 +82,6 @@
 }
 @media (hover: hover) {
   .gallery-arrow:hover:not(:disabled) {
-    background: var(--color-paper-pink);
+    background: var(--color-favorite-green);
   }
 }

@@ -1,4 +1,4 @@
-@import './theme.css';
+@import './config/theme.css';
 
 :root {
   font-family: var(--font-body);
@@ -68,7 +68,7 @@ fieldset {
 }
 h1,
 h2 {
-  font-family: var(--font-handwritten);
+  font-family: var(--font-heading);
   font-weight: 400;
 }
 h1 {
