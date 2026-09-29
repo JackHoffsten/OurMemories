@@ -51,7 +51,7 @@ def prepare_release(source, sha):
             ('deploy/postgres-init.sh', 'postgres-init.sh')):
         destination = release / destination_name
         destination.write_bytes((source / source_name).read_bytes())
-        destination.chmod(0o600)
+        destination.chmod(0o644)
 
 
 def main():
@@ -84,14 +84,14 @@ def main():
             compose(sha, 'up', '-d', '--wait', '--wait-timeout', '180', 'backend', 'gateway')
             for attempt in range(12):
                 try:
-                    with urllib.request.urlopen('https://our-memories.jackhoffsten.se/', timeout=10) as response:
+                    with urllib.request.urlopen('http://127.0.0.1:18081/', timeout=10) as response:
                         if response.status == 200 and b'<div id="root">' in response.read():
                             break
                 except OSError:
                     pass
                 time.sleep(5)
             else:
-                raise RuntimeError('Public HTTPS smoke test failed')
+                raise RuntimeError('Local gateway smoke test failed')
         except Exception:
             if previous:
                 compose(previous, 'up', '-d', '--wait', '--wait-timeout', '180', 'backend', 'gateway')
