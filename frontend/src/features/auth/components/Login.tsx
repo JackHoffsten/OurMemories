@@ -39,7 +39,22 @@ export function Login({ notice, onLogin }: { notice: string; onLogin: () => Prom
   return (
     <section className="gift-login" aria-labelledby="login-title">
       <div className="gift-introduction">
-        <h1 id="login-title">{content.login.heading}</h1>
+        <h1 id="login-title">
+          <span>{content.login.heading}</span>
+          <svg
+            className="login-heart"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" />
+          </svg>
+        </h1>
       </div>
       <div className={`gift-package${unwrapped ? ' is-unwrapped' : ''}`}>
         <div className="gift-ribbon" aria-hidden="true" />

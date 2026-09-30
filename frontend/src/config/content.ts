@@ -10,7 +10,7 @@ export const content = {
     footer: 'Jag älskar dig',
   },
   login: {
-    heading: 'Logga in för att öppna ♡',
+    heading: 'Logga in för att öppna',
     username: 'Användarnamn',
     password: 'Lösenord',
     open: 'Öppna',
