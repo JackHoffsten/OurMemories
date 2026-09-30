@@ -23,6 +23,6 @@
   --color-tape-pink: var(--color-favorite-pink);
   --color-ribbon: #ff59b3;
   --shadow-card: 0 8px 32px #37621c18;
-  --font-body: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
-  --font-heading: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+  --font-body: 'Nunito Sans Variable', system-ui, sans-serif;
+  --font-heading: 'Caveat Variable', cursive;
 }
