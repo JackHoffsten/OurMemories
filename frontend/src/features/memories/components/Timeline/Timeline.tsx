@@ -82,10 +82,20 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
       <div className="timeline-heading">
         <div>
           <h1 id="timeline-title">
-            {content.timeline.heading}{' '}
-            <span className="hand-heart" aria-hidden="true">
-              ♡
-            </span>
+            <span className="timeline-title-text">{content.timeline.heading}</span>
+            <svg
+              className="hand-heart"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" />
+            </svg>
           </h1>
         </div>
         <button className="primary" ref={addButton} onClick={() => setEditor('new')}>

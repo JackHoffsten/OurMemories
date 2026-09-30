@@ -10,15 +10,29 @@
   padding-bottom: 1.25rem;
 }
 .timeline-heading h1 {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
   font-size: clamp(2.5rem, 6vw, 3.5rem);
   letter-spacing: -0.035em;
   margin: 0;
+}
+.timeline-heading > div {
+  min-width: 0;
+}
+.timeline-title-text {
+  min-width: 0;
+  color: inherit;
+  overflow-wrap: anywhere;
 }
 .timeline-heading .primary {
   flex-shrink: 0;
 }
 .hand-heart {
-  display: inline-block;
+  display: block;
+  flex: 0 0 auto;
+  width: 0.75em;
+  height: 0.75em;
   color: var(--color-accent);
   transform: rotate(-12deg);
 }
@@ -73,6 +87,9 @@
 @media (max-width: 640px) {
   .timeline-heading {
     display: block;
+  }
+  .timeline-heading h1 {
+    font-size: clamp(2rem, 8vw, 2.5rem);
   }
   .timeline-heading .primary {
     margin-top: 1.25rem;
