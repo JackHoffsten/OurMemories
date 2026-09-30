@@ -70,6 +70,9 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+.story.expanded {
+  cursor: pointer;
+}
 .story-toggle {
   display: inline;
   color: var(--color-text-muted);

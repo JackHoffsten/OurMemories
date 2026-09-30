@@ -227,7 +227,7 @@ describe('our story', () => {
     expect(story.textContent).toBe(`${longMemory.story} Visa mindre`)
     fireEvent.click(title)
     fireEvent.click(location)
-    fireEvent.click(screen.getByRole('button', { name: 'Visa mindre' }))
+    fireEvent.click(story)
     expect(title.getAttribute('aria-expanded')).toBe('false')
     expect(location.getAttribute('aria-expanded')).toBe('false')
     expect(story.textContent).toBe(`${'S'.repeat(220)}… Läs mer`)

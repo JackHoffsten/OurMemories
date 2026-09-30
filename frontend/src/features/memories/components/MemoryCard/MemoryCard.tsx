@@ -57,7 +57,10 @@ export function MemoryCard({
             likelyOverflowing={Array.from(memory.title).length > 48}
           />
         </h2>
-        <p className={`story${storyExpanded ? ' expanded' : ''}`}>
+        <p
+          className={`story${storyExpanded ? ' expanded' : ''}`}
+          onClick={storyExpanded ? () => setStoryExpanded(false) : undefined}
+        >
           {longStory && !storyExpanded
             ? `${storyPreview.slice(0, 220).join('').trimEnd()}…`
             : memory.story}
@@ -68,7 +71,10 @@ export function MemoryCard({
                 type="button"
                 className="text-button story-toggle"
                 aria-expanded={storyExpanded}
-                onClick={() => setStoryExpanded((expanded) => !expanded)}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  setStoryExpanded((expanded) => !expanded)
+                }}
               >
                 {storyExpanded ? content.memory.readLess : content.memory.readMore}
               </button>
