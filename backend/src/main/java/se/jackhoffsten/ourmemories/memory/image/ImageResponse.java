@@ -1,4 +1,4 @@
-package se.jackhoffsten.ourmemories.memory;
+package se.jackhoffsten.ourmemories.memory.image;
 
 import java.util.UUID;
 

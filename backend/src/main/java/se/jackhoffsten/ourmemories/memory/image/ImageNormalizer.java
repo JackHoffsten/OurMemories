@@ -1,4 +1,4 @@
-package se.jackhoffsten.ourmemories.memory;
+package se.jackhoffsten.ourmemories.memory.image;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.metadata.exif.ExifIFD0Directory;
