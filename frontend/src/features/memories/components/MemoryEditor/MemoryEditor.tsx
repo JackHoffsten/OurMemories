@@ -175,6 +175,7 @@ export function MemoryEditor({
               <label htmlFor="memory-date">{content.editor.date}</label>
               <input
                 id="memory-date"
+                className="memory-date-input"
                 type="date"
                 required
                 value={draft.memoryDate}
