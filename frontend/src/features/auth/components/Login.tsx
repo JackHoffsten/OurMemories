@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { api, ApiError, errorMessage } from '../api'
-import { content } from '../config/content'
+import { authApi } from '../api'
+import { ApiError, errorMessage } from '../../../shared/api/client'
+import { content } from '../../../config/content'
 import './Login.css'
 
 export function Login({ notice, onLogin }: { notice: string; onLogin: () => Promise<void> }) {
@@ -16,7 +17,7 @@ export function Login({ notice, onLogin }: { notice: string; onLogin: () => Prom
     setBusy(true)
     setError('')
     try {
-      await api.login(String(data.get('username')), String(data.get('password')))
+      await authApi.login(String(data.get('username')), String(data.get('password')))
       setUnwrapped(true)
       if (!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
         await new Promise((resolve) => window.setTimeout(resolve, 450))

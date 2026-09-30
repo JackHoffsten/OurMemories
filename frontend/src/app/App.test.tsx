@@ -1,27 +1,27 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import App from './App'
-import { api, ApiError } from './api'
-import type { Memory } from './api'
+import { authApi } from '../features/auth/api'
+import { memoriesApi } from '../features/memories/api'
+import { ApiError } from '../shared/api/client'
+import type { Memory } from '../features/memories/types'
 
-vi.mock('./api', async (importOriginal) => {
-  const original = await importOriginal<typeof import('./api')>()
-  return {
-    ...original,
-    api: {
-      me: vi.fn(),
-      login: vi.fn(),
-      logout: vi.fn(),
-      memories: vi.fn(),
-      memory: vi.fn(),
-      save: vi.fn(),
-      delete: vi.fn(),
-      images: vi.fn(),
-      uploadImage: vi.fn(),
-      deleteImage: vi.fn(),
-    },
-  }
-})
+vi.mock('../features/auth/api', () => ({
+  authApi: { me: vi.fn(), login: vi.fn(), logout: vi.fn() },
+}))
+vi.mock('../features/memories/api', () => ({
+  memoriesApi: {
+    memories: vi.fn(),
+    memory: vi.fn(),
+    save: vi.fn(),
+    delete: vi.fn(),
+    images: vi.fn(),
+    uploadImage: vi.fn(),
+    deleteImage: vi.fn(),
+  },
+  imageUrl: (memoryId: string, imageId: string) =>
+    `/api/memories/${memoryId}/images/${imageId}/content`,
+}))
 
 const memory: Memory = {
   id: 'one',
@@ -34,7 +34,7 @@ const memory: Memory = {
   version: 2,
 }
 const page = { items: [memory], page: 0, size: 20, totalElements: 1, totalPages: 1 }
-const mocked = vi.mocked(api)
+const mocked = vi.mocked({ ...authApi, ...memoriesApi })
 
 beforeEach(() => {
   vi.resetAllMocks()

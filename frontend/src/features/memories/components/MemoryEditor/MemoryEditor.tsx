@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
-import { api, ApiError, errorMessage } from '../api'
-import type { Memory, MemoryInput } from '../api'
-import { MemoryGallery } from './MemoryGallery'
-import { content as siteContent } from '../config/content'
+import { memoriesApi } from '../../api'
+import { ApiError, errorMessage } from '../../../../shared/api/client'
+import type { Memory, MemoryInput } from '../../types'
+import { MemoryGallery } from '../MemoryGallery/MemoryGallery'
+import { content } from '../../../../config/content'
 import './MemoryEditor.css'
 
 type Attachment = { file: File; preview: string }
 
-function content(memory: Memory): MemoryInput {
+function toMemoryInput(memory: Memory): MemoryInput {
   return {
     title: memory.title,
     story: memory.story,
@@ -30,7 +31,7 @@ export function MemoryEditor({
 }) {
   const [current, setCurrent] = useState(memory)
   const [draft, setDraft] = useState<MemoryInput>(
-    memory ? content(memory) : { title: '', story: '', memoryDate: '', locationName: '' },
+    memory ? toMemoryInput(memory) : { title: '', story: '', memoryDate: '', locationName: '' },
   )
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -53,15 +54,15 @@ export function MemoryEditor({
     if (!files?.length) return
     const selected = Array.from(files)
     if (selected.some((file) => !['image/jpeg', 'image/png'].includes(file.type))) {
-      setError(siteContent.editor.unsupportedImages)
+      setError(content.editor.unsupportedImages)
       return
     }
     if (selected.some((file) => file.size > 10 * 1024 * 1024)) {
-      setError(siteContent.editor.imageTooLarge)
+      setError(content.editor.imageTooLarge)
       return
     }
     if (pending.current.length + selected.length > 10) {
-      setError(siteContent.editor.tooManyImages)
+      setError(content.editor.tooManyImages)
       return
     }
     replaceAttachments([
@@ -98,13 +99,13 @@ export function MemoryEditor({
     setError('')
     let saved = false
     try {
-      const result = await api.save(draft, current)
+      const result = await memoriesApi.save(draft, current)
       setCurrent(result)
       saved = true
 
       const toUpload = [...pending.current]
       for (const attachment of toUpload) {
-        await api.uploadImage(result.id, attachment.file)
+        await memoriesApi.uploadImage(result.id, attachment.file)
         replaceAttachments(pending.current.filter((item) => item !== attachment))
       }
 
@@ -117,7 +118,7 @@ export function MemoryEditor({
     } catch (cause) {
       if (cause instanceof ApiError && cause.status === 401) onExpired()
       else {
-        setError((saved ? siteContent.editor.uploadFailed : '') + errorMessage(cause))
+        setError((saved ? content.editor.uploadFailed : '') + errorMessage(cause))
         setConflict(cause instanceof ApiError && cause.status === 409)
       }
     } finally {
@@ -126,12 +127,12 @@ export function MemoryEditor({
   }
 
   async function reload() {
-    if (!current || !window.confirm(siteContent.editor.replaceDraft)) return
+    if (!current || !window.confirm(content.editor.replaceDraft)) return
     setBusy(true)
     try {
-      const latest = await api.memory(current.id)
+      const latest = await memoriesApi.memory(current.id)
       setCurrent(latest)
-      setDraft(content(latest))
+      setDraft(toMemoryInput(latest))
       setDirty(pending.current.length > 0)
       setConflict(false)
       setError('')
@@ -146,9 +147,9 @@ export function MemoryEditor({
   return (
     <section className="editor" aria-labelledby="editor-title">
       <h1 id="editor-title" tabIndex={-1} ref={heading}>
-        {memory ? siteContent.editor.editHeading : siteContent.editor.newHeading}
+        {memory ? content.editor.editHeading : content.editor.newHeading}
       </h1>
-      <p className="lede">{siteContent.editor.introduction}</p>
+      <p className="lede">{content.editor.introduction}</p>
       {error && (
         <div className="notice" role="alert">
           {error}
@@ -156,12 +157,12 @@ export function MemoryEditor({
       )}
       {conflict && (
         <button type="button" className="secondary" disabled={busy} onClick={() => void reload()}>
-          {siteContent.editor.reload}
+          {content.editor.reload}
         </button>
       )}
       <form onSubmit={submit}>
         <fieldset disabled={busy}>
-          <label htmlFor="title">{siteContent.editor.title}</label>
+          <label htmlFor="title">{content.editor.title}</label>
           <input
             id="title"
             required
@@ -171,7 +172,7 @@ export function MemoryEditor({
           />
           <div className="form-row">
             <div>
-              <label htmlFor="memory-date">{siteContent.editor.date}</label>
+              <label htmlFor="memory-date">{content.editor.date}</label>
               <input
                 id="memory-date"
                 type="date"
@@ -182,8 +183,8 @@ export function MemoryEditor({
             </div>
             <div>
               <label htmlFor="location">
-                {siteContent.editor.location}{' '}
-                <span className="optional">{siteContent.editor.optional}</span>
+                {content.editor.location}{' '}
+                <span className="optional">{content.editor.optional}</span>
               </label>
               <input
                 id="location"
@@ -193,7 +194,7 @@ export function MemoryEditor({
               />
             </div>
           </div>
-          <label htmlFor="story">{siteContent.editor.story}</label>
+          <label htmlFor="story">{content.editor.story}</label>
           <textarea
             id="story"
             required
@@ -203,8 +204,7 @@ export function MemoryEditor({
             onChange={(event) => change('story', event.target.value)}
           />
           <label htmlFor="images">
-            {siteContent.editor.images}{' '}
-            <span className="optional">{siteContent.editor.optional}</span>
+            {content.editor.images} <span className="optional">{content.editor.optional}</span>
           </label>
           <input
             id="images"
@@ -218,7 +218,7 @@ export function MemoryEditor({
             }}
           />
           <p id="image-help" className="image-help">
-            {siteContent.editor.imageHelp}
+            {content.editor.imageHelp}
           </p>
           {current && (
             <MemoryGallery
@@ -231,22 +231,22 @@ export function MemoryEditor({
             />
           )}
           {attachments.length > 0 && (
-            <ul className="pending-gallery" aria-label={siteContent.editor.pendingImages}>
+            <ul className="pending-gallery" aria-label={content.editor.pendingImages}>
               {attachments.map((item) => (
                 <li key={item.preview}>
-                  <img src={item.preview} alt={siteContent.editor.previewLabel(item.file.name)} />
+                  <img src={item.preview} alt={content.editor.previewLabel(item.file.name)} />
                   <span className="pending-image-name">{item.file.name}</span>
                   <button
                     type="button"
                     className="text-button"
-                    aria-label={siteContent.editor.removeLabel(item.file.name)}
+                    aria-label={content.editor.removeLabel(item.file.name)}
                     onClick={() =>
                       replaceAttachments(
                         pending.current.filter((attachment) => attachment !== item),
                       )
                     }
                   >
-                    {siteContent.editor.remove}
+                    {content.editor.remove}
                   </button>
                 </li>
               ))}
@@ -254,16 +254,16 @@ export function MemoryEditor({
           )}
           <div className="form-actions">
             <button className="primary" disabled={conflict}>
-              {busy ? siteContent.editor.saving : siteContent.editor.save}
+              {busy ? content.editor.saving : content.editor.save}
             </button>
             <button
               type="button"
               className="text-button"
               onClick={() => {
-                if (!dirty || window.confirm(siteContent.editor.discardDraft)) onCancel()
+                if (!dirty || window.confirm(content.editor.discardDraft)) onCancel()
               }}
             >
-              {siteContent.editor.cancel}
+              {content.editor.cancel}
             </button>
           </div>
         </fieldset>

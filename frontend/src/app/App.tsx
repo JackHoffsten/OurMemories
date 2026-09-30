@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
-import { api, ApiError, errorMessage } from './api'
-import { Login } from './components/Login'
-import { Timeline } from './components/Timeline'
-import { content } from './config/content'
+import { authApi } from '../features/auth/api'
+import { ApiError, errorMessage } from '../shared/api/client'
+import { Login } from '../features/auth/components/Login'
+import { Timeline } from '../features/memories/components/Timeline/Timeline'
+import { content } from '../config/content'
 import './App.css'
 
 function App() {
@@ -12,7 +13,7 @@ function App() {
 
   useEffect(() => {
     let active = true
-    api
+    authApi
       .me()
       .then((result) => {
         if (active) setUser(result.username)
@@ -54,7 +55,7 @@ function App() {
           <Login
             notice={error}
             onLogin={async () => {
-              setUser((await api.me()).username)
+              setUser((await authApi.me()).username)
               setError('')
             }}
           />

@@ -1,4 +1,5 @@
-@import './config/theme.css';
+@import '../config/theme.css';
+@import './controls.css';
 
 :root {
   font-family: var(--font-body);
@@ -87,4 +88,26 @@ p {
 em {
   color: var(--color-accent);
   font-weight: 400;
+}
+
+span {
+  color: var(--color-accent);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
 }

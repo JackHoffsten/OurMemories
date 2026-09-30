@@ -1,7 +1,9 @@
-import { useLayoutEffect, useRef, useState } from 'react'
-import type { Memory } from '../api'
-import { MemoryGallery } from './MemoryGallery'
-import { content } from '../config/content'
+import { useState } from 'react'
+import type { Memory } from '../../types'
+import { ExpandableText } from '../ExpandableText'
+import './MemoryCard.css'
+import { MemoryGallery } from '../MemoryGallery/MemoryGallery'
+import { content } from '../../../../config/content'
 
 const dateFormatter = new Intl.DateTimeFormat('sv-SE', {
   day: 'numeric',
@@ -9,70 +11,6 @@ const dateFormatter = new Intl.DateTimeFormat('sv-SE', {
   year: 'numeric',
   timeZone: 'UTC',
 })
-
-function ExpandableText({
-  value,
-  className,
-  likelyOverflowing,
-}: {
-  value: string
-  className: string
-  likelyOverflowing: boolean
-}) {
-  const contentRef = useRef<HTMLSpanElement>(null)
-  const [expanded, setExpanded] = useState(false)
-  const [overflowing, setOverflowing] = useState(likelyOverflowing)
-
-  useLayoutEffect(() => {
-    const content = contentRef.current
-    if (!content || expanded) {
-      return
-    }
-
-    const measureOverflow = () => {
-      if (content.clientWidth === 0) {
-        return
-      }
-
-      setOverflowing(
-        content.scrollHeight > content.clientHeight + 1 ||
-          content.scrollWidth > content.clientWidth + 1,
-      )
-    }
-
-    measureOverflow()
-
-    if (typeof ResizeObserver === 'undefined') {
-      return
-    }
-
-    const observer = new ResizeObserver(measureOverflow)
-    observer.observe(content)
-    return () => observer.disconnect()
-  }, [expanded, overflowing, value])
-
-  const classes = `memory-text-toggle ${className}${expanded ? ' expanded' : ''}`
-  const content = (
-    <span ref={contentRef} className="memory-text-content">
-      {value}
-    </span>
-  )
-
-  if (!overflowing) {
-    return <span className={classes}>{content}</span>
-  }
-
-  return (
-    <button
-      className={classes}
-      type="button"
-      aria-expanded={expanded}
-      onClick={() => setExpanded((current) => !current)}
-    >
-      {content}
-    </button>
-  )
-}
 
 export function MemoryCard({
   memory,

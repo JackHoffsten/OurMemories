@@ -1,9 +1,11 @@
+import './Timeline.css'
 import { useEffect, useRef, useState } from 'react'
-import { api, ApiError, errorMessage } from '../api'
-import type { Memory, MemoryPage } from '../api'
-import { MemoryEditor } from './MemoryEditor'
-import { MemoryCard } from './MemoryCard'
-import { content } from '../config/content'
+import { memoriesApi } from '../../api'
+import { ApiError, errorMessage } from '../../../../shared/api/client'
+import type { Memory, MemoryPage } from '../../types'
+import { MemoryEditor } from '../MemoryEditor/MemoryEditor'
+import { MemoryCard } from '../MemoryCard/MemoryCard'
+import { content } from '../../../../config/content'
 
 export function Timeline({ onExpired }: { onExpired: () => void }) {
   const [page, setPage] = useState(0)
@@ -20,7 +22,7 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
 
   useEffect(() => {
     const controller = new AbortController()
-    api
+    memoriesApi
       .memories(page, controller.signal)
       .then((result) => {
         if (controller.signal.aborted) return
@@ -47,7 +49,7 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
     setBusy(true)
     setError('')
     try {
-      await api.delete(memory.id)
+      await memoriesApi.delete(memory.id)
       setDeleting(null)
       setAnnouncement(content.timeline.deleted)
       setRevision((value) => value + 1)

@@ -1,0 +1,114 @@
+.memory-card {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  background: var(--color-paper);
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  overflow-wrap: anywhere;
+}
+.location {
+  margin: 0;
+  color: var(--color-accent-text);
+  font-size: 0.8rem;
+}
+.memory-card h2 {
+  margin-inline: 0;
+  margin-top: 0.65rem;
+  max-width: 100%;
+  font-size: 1.8rem;
+}
+.memory-card h2:first-child {
+  margin-top: 0;
+}
+.memory-text-toggle,
+.story-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+.memory-text-toggle {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  line-height: inherit;
+}
+.memory-text-content {
+  display: block;
+  color: inherit;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.title-text:not(.expanded) .memory-text-content {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  max-height: 4.2em;
+}
+.location-text:not(.expanded) .memory-text-content {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.story {
+  max-width: 100%;
+  color: var(--color-text);
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.story-toggle {
+  display: inline;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.card-actions {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-border);
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+}
+.card-actions .text-button {
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+.card-actions .text-button:last-child {
+  color: var(--color-accent);
+}
+.delete-confirmation {
+  border-top: 1px solid var(--color-border-pink);
+  margin-top: 1rem;
+}
+@media (hover: hover) {
+  .card-actions .text-button:hover:not(:disabled) {
+    background: var(--color-paper-pink);
+  }
+}
+@media (max-width: 640px) {
+  .memory-card {
+    padding: 1.15rem;
+  }
+  .memory-card h2 {
+    font-size: 1.6rem;
+  }
+}

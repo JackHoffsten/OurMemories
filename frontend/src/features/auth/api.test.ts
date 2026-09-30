@@ -11,8 +11,8 @@ it('shows a Swedish throttling message without retrying login', async () => {
     )
     .mockResolvedValueOnce(new Response('', { status: 429 }))
   vi.stubGlobal('fetch', fetch)
-  const { api } = await import('./api')
-  await expect(api.login('someone', 'a test password')).rejects.toMatchObject({
+  const { authApi } = await import('./api')
+  await expect(authApi.login('someone', 'a test password')).rejects.toMatchObject({
     status: 429,
     message: 'För många inloggningsförsök. Vänta en stund och försök igen.',
   })

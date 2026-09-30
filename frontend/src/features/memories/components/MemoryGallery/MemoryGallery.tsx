@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { api, ApiError, errorMessage, imageUrl } from '../api'
-import type { MemoryImage } from '../api'
+import { memoriesApi, imageUrl } from '../../api'
+import { ApiError, errorMessage } from '../../../../shared/api/client'
+import type { MemoryImage } from '../../types'
 import './MemoryGallery.css'
-import { ChevronIcon } from '../icons'
-import { content } from '../config/content'
+import { ChevronIcon } from '../../../../shared/components/ChevronIcon'
+import { content } from '../../../../config/content'
 
 export function MemoryGallery({
   memoryId,
@@ -31,7 +32,7 @@ export function MemoryGallery({
 
   useEffect(() => {
     const controller = new AbortController()
-    api
+    memoriesApi
       .images(memoryId, controller.signal)
       .then((result) => {
         if (!controller.signal.aborted) {
@@ -91,7 +92,7 @@ export function MemoryGallery({
     if (!window.confirm(content.gallery.confirmRemove)) return
     setRemoving(id)
     try {
-      await api.deleteImage(memoryId, id)
+      await memoriesApi.deleteImage(memoryId, id)
       setImages((previous) => previous.filter((image) => image.id !== id))
       setError('')
     } catch (cause) {
