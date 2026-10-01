@@ -25,7 +25,7 @@ class JdbcMemoryImageService implements MemoryImageService {
         requireMemory(memoryId, false);
         return jdbc.query(
                 """
-                SELECT id, content_type, width, height, octet_length(content) AS size
+                SELECT id, content_type, width, height, octet_length(content) AS size, description
                 FROM capsule.memory_images WHERE memory_id = ? ORDER BY created_at, id
                 """,
                 (row, index) ->
@@ -34,13 +34,14 @@ class JdbcMemoryImageService implements MemoryImageService {
                                 row.getString("content_type"),
                                 row.getInt("width"),
                                 row.getInt("height"),
-                                row.getLong("size")),
+                                row.getLong("size"),
+                                row.getString("description")),
                 memoryId);
     }
 
     @Override
     @Transactional
-    public ImageResponse upload(UUID memoryId, MultipartFile file) {
+    public ImageResponse upload(UUID memoryId, MultipartFile file, String description) {
         requireMemory(memoryId, true);
         if (jdbc.queryForObject(
                         "SELECT count(*) FROM capsule.memory_images WHERE memory_id = ?",
@@ -54,17 +55,23 @@ class JdbcMemoryImageService implements MemoryImageService {
         UUID id = UUID.randomUUID();
         jdbc.update(
                 """
-                INSERT INTO capsule.memory_images (id, memory_id, content_type, width, height, content)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO capsule.memory_images (id, memory_id, content_type, width, height, content, description)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
                 id,
                 memoryId,
                 image.contentType(),
                 image.width(),
                 image.height(),
-                image.bytes());
+                image.bytes(),
+                description.strip());
         return new ImageResponse(
-                id, image.contentType(), image.width(), image.height(), image.bytes().length);
+                id,
+                image.contentType(),
+                image.width(),
+                image.height(),
+                image.bytes().length,
+                description.strip());
     }
 
     @Override
@@ -102,6 +109,19 @@ class JdbcMemoryImageService implements MemoryImageService {
                         UUID.class,
                         id);
         if (matches.isEmpty()) throw notFound();
+    }
+
+    @Override
+    @Transactional
+    public void updateDescription(UUID memoryId, UUID imageId, String description) {
+        if (jdbc.update(
+                        "UPDATE capsule.memory_images SET description = ? WHERE memory_id = ? AND id = ?",
+                        description.strip(),
+                        memoryId,
+                        imageId)
+                == 0) {
+            throw notFound();
+        }
     }
 
     private ResponseStatusException notFound() {

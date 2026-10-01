@@ -204,6 +204,32 @@ class MemoryApiTests {
                             .getResponse()
                             .getContentAsString();
             String imageId = JsonPath.read(result, "$.id");
+            String imagePath = "/api/memories/" + id + "/images/" + imageId;
+            mvc.perform(
+                            patch(imagePath)
+                                    .session(session)
+                                    .contentType("application/json")
+                                    .content("{\"description\":\"Our first walk\"}"))
+                    .andExpect(status().isForbidden());
+            mvc.perform(
+                            write(patch(imagePath))
+                                    .contentType("application/json")
+                                    .content("{\"description\":\"  Our first walk  \"}"))
+                    .andExpect(status().isNoContent());
+            mvc.perform(get("/api/memories/" + id + "/images").session(session))
+                    .andExpect(
+                            jsonPath("$[?(@.id == '" + imageId + "')].description")
+                                    .value(org.hamcrest.Matchers.contains("Our first walk")));
+            mvc.perform(
+                            write(patch(imagePath))
+                                    .contentType("application/json")
+                                    .content("{\"description\":\"" + "x".repeat(1001) + "\"}"))
+                    .andExpect(status().isBadRequest());
+            mvc.perform(
+                            write(patch("/api/memories/" + otherId + "/images/" + imageId))
+                                    .contentType("application/json")
+                                    .content("{\"description\":\"Wrong memory\"}"))
+                    .andExpect(status().isNotFound());
             String url = "/api/memories/" + id + "/images/" + imageId + "/content";
             mvc.perform(get(url)).andExpect(status().isUnauthorized());
             mvc.perform(get("/api/memories/" + id + "/images"))

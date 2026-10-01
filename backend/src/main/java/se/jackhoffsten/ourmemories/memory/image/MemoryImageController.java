@@ -1,5 +1,7 @@
 package se.jackhoffsten.ourmemories.memory.image;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
@@ -25,8 +27,10 @@ class MemoryImageController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<ImageResponse> upload(
-            @PathVariable UUID memoryId, @RequestPart("file") MultipartFile file) {
-        var image = images.upload(memoryId, file);
+            @PathVariable UUID memoryId,
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(defaultValue = "") @Size(max = 1000) String description) {
+        var image = images.upload(memoryId, file, description);
         return ResponseEntity.created(
                         URI.create(
                                 "/api/memories/" + memoryId + "/images/" + image.id() + "/content"))
@@ -50,6 +54,15 @@ class MemoryImageController {
     @DeleteMapping("/{imageId}")
     ResponseEntity<Void> delete(@PathVariable UUID memoryId, @PathVariable UUID imageId) {
         images.delete(memoryId, imageId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{imageId}")
+    ResponseEntity<Void> updateDescription(
+            @PathVariable UUID memoryId,
+            @PathVariable UUID imageId,
+            @Valid @RequestBody ImageDescriptionRequest request) {
+        images.updateDescription(memoryId, imageId, request.description());
         return ResponseEntity.noContent().build();
     }
 }
