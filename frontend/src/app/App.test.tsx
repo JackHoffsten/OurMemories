@@ -240,9 +240,14 @@ describe('our story', () => {
     render(<App />)
     expect(await screen.findByText('<img src=x onerror=alert(1)>')).toBeTruthy()
     expect(screen.queryByRole('img')).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Äldre minnen' }))
+    expect((screen.getByLabelText('Sortera minnen') as HTMLSelectElement).value).toBe('ASC')
+    fireEvent.click(screen.getByRole('button', { name: 'Nyare minnen' }))
     await waitFor(() =>
-      expect(mocked.memories).toHaveBeenLastCalledWith(1, expect.any(AbortSignal)),
+      expect(mocked.memories).toHaveBeenLastCalledWith(1, expect.any(AbortSignal), 'ASC'),
+    )
+    fireEvent.change(await screen.findByLabelText('Sortera minnen'), { target: { value: 'DESC' } })
+    await waitFor(() =>
+      expect(mocked.memories).toHaveBeenLastCalledWith(0, expect.any(AbortSignal), 'DESC'),
     )
   })
 

@@ -25,6 +25,8 @@ export const content = {
     savedOne: 'sparat minne',
     savedMany: 'sparade minnen',
     newestFirst: 'Nyaste först',
+    oldestFirst: 'Äldsta först',
+    sortLabel: 'Sortera minnen',
     emptyHeading: 'Lägg till ett minne',
     addFirst: 'Lägg till vårt första minne',
     pages: 'Minnessidor',

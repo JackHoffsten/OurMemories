@@ -81,17 +81,24 @@ class MemoryApiTests {
     }
 
     @Test
-    void listsMemoriesNewestFirstWithBoundedPagination() throws Exception {
+    void listsMemoriesOldestFirstByDefaultAndSupportsNewestFirstWithBoundedPagination()
+            throws Exception {
         create("Older", "2025-02-03");
         create("Newer", "2026-02-03");
         mvc.perform(get("/api/memories?page=0&size=1").session(session))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items.length()").value(1))
-                .andExpect(jsonPath("$.items[0].title").value("Newer"))
+                .andExpect(jsonPath("$.items[0].title").value("Older"))
                 .andExpect(jsonPath("$.totalElements").value(2))
                 .andExpect(jsonPath("$.totalPages").value(2));
         mvc.perform(get("/api/memories?page=1&size=1").session(session))
+                .andExpect(jsonPath("$.items[0].title").value("Newer"));
+        mvc.perform(get("/api/memories?page=0&size=1&order=DESC").session(session))
+                .andExpect(jsonPath("$.items[0].title").value("Newer"));
+        mvc.perform(get("/api/memories?page=1&size=1&order=DESC").session(session))
                 .andExpect(jsonPath("$.items[0].title").value("Older"));
+        mvc.perform(get("/api/memories?order=invalid").session(session))
+                .andExpect(status().isBadRequest());
         for (String query :
                 new String[] {"page=-1", "size=0", "size=101", "page=invalid", "page=2147483647"}) {
             mvc.perform(get("/api/memories?" + query).session(session))

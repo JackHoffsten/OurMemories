@@ -18,7 +18,7 @@ class JpaMemoryService implements MemoryService {
     }
 
     @Override
-    public MemoryPage list(int page, int size) {
+    public MemoryPage list(int page, int size, Sort.Direction order) {
         if (page < 0 || size < 1 || size > 100) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Page must be nonnegative and size must be 1–100.");
@@ -29,9 +29,7 @@ class JpaMemoryService implements MemoryService {
         }
 
         var result =
-                memories.findAll(
-                        PageRequest.of(
-                                page, size, Sort.by(Sort.Direction.DESC, "memoryDate", "id")));
+                memories.findAll(PageRequest.of(page, size, Sort.by(order, "memoryDate", "id")));
 
         return new MemoryPage(
                 result.getContent().stream().map((Memory m) -> m.toResponse()).toList(),

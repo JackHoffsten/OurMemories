@@ -9,10 +9,11 @@ import { content } from '../../../../config/content'
 
 export function Timeline({ onExpired }: { onExpired: () => void }) {
   const [page, setPage] = useState(0)
+  const [order, setOrder] = useState<'ASC' | 'DESC'>('ASC')
   const [revision, setRevision] = useState(0)
   const [data, setData] = useState<MemoryPage | null>(null)
   const [loaded, setLoaded] = useState('')
-  const loading = loaded !== `${page}:${revision}`
+  const loading = loaded !== `${page}:${revision}:${order}`
   const [error, setError] = useState('')
   const [editor, setEditor] = useState<Memory | 'new' | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
@@ -23,7 +24,7 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
   useEffect(() => {
     const controller = new AbortController()
     memoriesApi
-      .memories(page, controller.signal)
+      .memories(page, controller.signal, order)
       .then((result) => {
         if (controller.signal.aborted) return
         setError('')
@@ -36,10 +37,10 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
         else setError(errorMessage(cause))
       })
       .finally(() => {
-        if (!controller.signal.aborted) setLoaded(`${page}:${revision}`)
+        if (!controller.signal.aborted) setLoaded(`${page}:${revision}:${order}`)
       })
     return () => controller.abort()
-  }, [page, revision, onExpired])
+  }, [page, revision, order, onExpired])
 
   function closeEditor() {
     setEditor(null)
@@ -126,7 +127,18 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
                 {data.totalElements}{' '}
                 {data.totalElements === 1 ? content.timeline.savedOne : content.timeline.savedMany}
               </span>
-              <span>{content.timeline.newestFirst}</span>
+              <select
+                className="timeline-order"
+                aria-label={content.timeline.sortLabel}
+                value={order}
+                onChange={(event) => {
+                  setOrder(event.target.value as 'ASC' | 'DESC')
+                  setPage(0)
+                }}
+              >
+                <option value="ASC">{content.timeline.oldestFirst}</option>
+                <option value="DESC">{content.timeline.newestFirst}</option>
+              </select>
             </div>
             {data.items.length === 0 ? (
               <div className="empty-state">
@@ -161,7 +173,7 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
                   disabled={page === 0}
                   onClick={() => setPage((value) => value - 1)}
                 >
-                  {content.timeline.newer}
+                  {order === 'ASC' ? content.timeline.older : content.timeline.newer}
                 </button>
                 <span>{content.timeline.page(page + 1, data.totalPages)}</span>
                 <button
@@ -169,7 +181,7 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
                   disabled={page + 1 >= data.totalPages}
                   onClick={() => setPage((value) => value + 1)}
                 >
-                  {content.timeline.older}
+                  {order === 'ASC' ? content.timeline.newer : content.timeline.older}
                 </button>
               </nav>
             )}

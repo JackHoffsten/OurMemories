@@ -3,6 +3,7 @@ package se.jackhoffsten.ourmemories.memory;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.UUID;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +19,9 @@ class MemoryController {
     @GetMapping
     MemoryPage list(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return memories.list(page, size);
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "ASC") Sort.Direction order) {
+        return memories.list(page, size, order);
     }
 
     @GetMapping("/{id}")

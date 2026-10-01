@@ -5,8 +5,8 @@ export const imageUrl = (memoryId: string, imageId: string) =>
   `/api/memories/${memoryId}/images/${imageId}/content`
 
 export const memoriesApi = {
-  memories: (page: number, signal?: AbortSignal) =>
-    request<MemoryPage>(`/memories?page=${page}&size=20`, { signal }),
+  memories: (page: number, signal?: AbortSignal, order: 'ASC' | 'DESC' = 'ASC') =>
+    request<MemoryPage>(`/memories?page=${page}&size=20&order=${order}`, { signal }),
   memory: (id: string) => request<Memory>(`/memories/${id}`),
   save: (input: MemoryInput, memory?: Memory) =>
     request<Memory>(memory ? `/memories/${memory.id}` : '/memories', {
