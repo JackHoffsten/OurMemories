@@ -6,6 +6,7 @@ import './MemoryGallery.css'
 import { ChevronIcon } from '../../../../shared/components/ChevronIcon'
 import { content } from '../../../../config/content'
 import { ImageDescription } from './ImageDescription'
+import { ImageViewer } from './ImageViewer'
 
 export function MemoryGallery({
   memoryId,
@@ -27,6 +28,8 @@ export function MemoryGallery({
   onDescriptionChange?: (id: string, description: string | undefined) => void
 }) {
   const [images, setImages] = useState<MemoryImage[]>([])
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null)
+  const viewerTrigger = useRef<HTMLButtonElement | null>(null)
   const [error, setError] = useState('')
   const [removing, setRemoving] = useState<string | null>(null)
   const [retry, setRetry] = useState(0)
@@ -111,6 +114,16 @@ export function MemoryGallery({
 
   return (
     <>
+      {viewerIndex !== null && images.length > 0 && (
+        <ImageViewer
+          memoryId={memoryId}
+          image={images[Math.min(viewerIndex, images.length - 1)]}
+          onClose={() => {
+            setViewerIndex(null)
+            viewerTrigger.current?.focus()
+          }}
+        />
+      )}
       {error && (
         <p className="notice" role="alert">
           {content.gallery.loadFailed} {error}{' '}
@@ -140,10 +153,13 @@ export function MemoryGallery({
           <ul className="memory-gallery" ref={listRef} aria-label={content.gallery.imagesLabel}>
             {images.map((image, index) => (
               <li key={image.id}>
-                <a
-                  href={imageUrl(memoryId, image.id)}
-                  target="_blank"
-                  rel="noreferrer"
+                <button
+                  type="button"
+                  className="gallery-image-button"
+                  onClick={(event) => {
+                    viewerTrigger.current = event.currentTarget
+                    setViewerIndex(index)
+                  }}
                   aria-label={content.gallery.openLabel(index + 1, title)}
                 >
                   <img
@@ -154,7 +170,7 @@ export function MemoryGallery({
                     width={image.width}
                     height={image.height}
                   />
-                </a>
+                </button>
                 {editable ? (
                   <div className="image-description-editor">
                     <label htmlFor={`image-description-${image.id}`}>
