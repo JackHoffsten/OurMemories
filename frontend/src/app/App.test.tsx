@@ -5,6 +5,7 @@ import { authApi } from '../features/auth/api'
 import { memoriesApi } from '../features/memories/api'
 import { ApiError } from '../shared/api/client'
 import type { Memory } from '../features/memories/types'
+import { MemoryEditor } from '../features/memories/components/MemoryEditor/MemoryEditor'
 
 vi.mock('../features/auth/api', () => ({
   authApi: { me: vi.fn(), login: vi.fn(), logout: vi.fn() },
@@ -18,6 +19,7 @@ vi.mock('../features/memories/api', () => ({
     images: vi.fn(),
     uploadImage: vi.fn(),
     deleteImage: vi.fn(),
+    describeImage: vi.fn(),
   },
   imageUrl: (memoryId: string, imageId: string) =>
     `/api/memories/${memoryId}/images/${imageId}/content`,
@@ -45,6 +47,51 @@ beforeEach(() => {
 afterEach(cleanup)
 
 describe('our story', () => {
+  it('edits and clears an image description', async () => {
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        observe() {}
+        disconnect() {}
+      },
+    )
+    const scrollTo = vi.fn()
+    Object.defineProperty(HTMLElement.prototype, 'scrollTo', {
+      configurable: true,
+      value: scrollTo,
+    })
+    mocked.images.mockResolvedValue([
+      {
+        id: 'photo',
+        contentType: 'image/png',
+        width: 4,
+        height: 3,
+        size: 100,
+        description: 'Vid vattnet',
+      },
+    ])
+    mocked.describeImage.mockResolvedValue()
+    mocked.save.mockResolvedValue(memory)
+    render(
+      <MemoryEditor memory={memory} onSaved={vi.fn()} onCancel={vi.fn()} onExpired={vi.fn()} />,
+    )
+    const field = await screen.findByLabelText('Beskrivning till bild 1')
+    fireEvent.change(field, { target: { value: '  Vår första promenad  ' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Spara minnet' }))
+    await waitFor(() =>
+      expect(mocked.describeImage).toHaveBeenCalledWith(memory.id, 'photo', 'Vår första promenad'),
+    )
+    await waitFor(() =>
+      expect(
+        (screen.getByRole('button', { name: 'Spara minnet' }) as HTMLButtonElement).disabled,
+      ).toBe(false),
+    )
+    fireEvent.change(field, { target: { value: '' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Spara minnet' }))
+    await waitFor(() =>
+      expect(mocked.describeImage).toHaveBeenLastCalledWith(memory.id, 'photo', ''),
+    )
+  })
   it('shows a login error, then opens the timeline with Swedish dates', async () => {
     mocked.me.mockRejectedValueOnce(new ApiError(401, 'Unauthorized'))
     mocked.login.mockRejectedValueOnce(new ApiError(401, 'Unauthorized')).mockResolvedValueOnce()
@@ -128,6 +175,7 @@ describe('our story', () => {
     mocked.memories.mockResolvedValue({ ...page, items: [], totalElements: 0, totalPages: 0 })
     mocked.save.mockResolvedValue(memory)
     mocked.uploadImage.mockRejectedValueOnce(new Error('Offline')).mockResolvedValueOnce({
+      description: '',
       id: 'photo',
       contentType: 'image/png',
       width: 4,
@@ -148,6 +196,8 @@ describe('our story', () => {
     const file = new File(['png'], 'walk.png', { type: 'image/png' })
     fireEvent.change(screen.getByLabelText(/Bilder \(valfritt\)/), { target: { files: [file] } })
     expect(screen.getByAltText('Förhandsvisning av walk.png')).toBeTruthy()
+    fireEvent.change(screen.getByLabelText('Bildbeskrivning'), { target: { value: 'Vid vattnet' } })
+    expect(URL.revokeObjectURL).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Spara minnet' }))
     expect((await screen.findByRole('alert')).textContent).toContain('Minnet har sparats')
     expect(screen.getByAltText('Förhandsvisning av walk.png')).toBeTruthy()
@@ -155,7 +205,7 @@ describe('our story', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Spara minnet' }))
     expect(await screen.findByRole('heading', { name: memory.title })).toBeTruthy()
     expect(mocked.save.mock.calls[1][1]).toEqual(memory)
-    expect(mocked.uploadImage).toHaveBeenLastCalledWith(memory.id, file)
+    expect(mocked.uploadImage).toHaveBeenLastCalledWith(memory.id, file, 'Vid vattnet')
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:preview')
     vi.unstubAllGlobals()
   })

@@ -62,6 +62,68 @@
   color: var(--color-primary);
   transition: background-color 160ms ease;
 }
+.image-description,
+.image-description-editor {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.image-description-editor textarea {
+  width: 100%;
+  resize: vertical;
+}
+.image-description-wrap {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+.image-description {
+  line-height: 1.8;
+  color: var(--color-text);
+  text-align: center;
+  font-size: 0.9rem;
+}
+.image-description.expanded {
+  cursor: pointer;
+}
+.image-description-probe {
+  position: absolute;
+  inset: 0 0 auto;
+  visibility: hidden;
+  pointer-events: none;
+}
+.image-description-toggle {
+  display: inline;
+  appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font: inherit;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.image-description-editor {
+  background: var(--color-paper);
+  border-top: 1px solid var(--color-border-pink);
+}
+.image-description-editor label {
+  text-align: center;
+  margin-top: 0;
+  font-size: 0.85rem;
+}
+.image-description-editor textarea {
+  text-align: center;
+}
 .gallery-arrow--prev {
   grid-column: 1;
 }

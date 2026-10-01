@@ -7,7 +7,7 @@ import { MemoryGallery } from '../MemoryGallery/MemoryGallery'
 import { content } from '../../../../config/content'
 import './MemoryEditor.css'
 
-type Attachment = { file: File; preview: string }
+type Attachment = { file: File; preview: string; description: string }
 
 function toMemoryInput(memory: Memory): MemoryInput {
   return {
@@ -40,11 +40,12 @@ export function MemoryEditor({
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const pending = useRef<Attachment[]>([])
   const [imageRevision, setImageRevision] = useState(0)
+  const [imageDescriptions, setImageDescriptions] = useState<Record<string, string>>({})
   useEffect(() => () => pending.current.forEach((item) => URL.revokeObjectURL(item.preview)), [])
 
   function replaceAttachments(next: Attachment[]) {
     pending.current
-      .filter((item) => !next.includes(item))
+      .filter((item) => !next.some((attachment) => attachment.preview === item.preview))
       .forEach((item) => URL.revokeObjectURL(item.preview))
     pending.current = next
     setAttachments(next)
@@ -67,7 +68,7 @@ export function MemoryEditor({
     }
     replaceAttachments([
       ...pending.current,
-      ...selected.map((file) => ({ file, preview: URL.createObjectURL(file) })),
+      ...selected.map((file) => ({ file, preview: URL.createObjectURL(file), description: '' })),
     ])
     setDirty(true)
     setError('')
@@ -103,9 +104,19 @@ export function MemoryEditor({
       setCurrent(result)
       saved = true
 
+      for (const [imageId, description] of Object.entries(imageDescriptions)) {
+        await memoriesApi.describeImage(result.id, imageId, description.trim())
+        setImageRevision((value) => value + 1)
+        setImageDescriptions((previous) => {
+          const next = { ...previous }
+          delete next[imageId]
+          return next
+        })
+      }
+
       const toUpload = [...pending.current]
       for (const attachment of toUpload) {
-        await memoriesApi.uploadImage(result.id, attachment.file)
+        await memoriesApi.uploadImage(result.id, attachment.file, attachment.description)
         replaceAttachments(pending.current.filter((item) => item !== attachment))
       }
 
@@ -133,7 +144,7 @@ export function MemoryEditor({
       const latest = await memoriesApi.memory(current.id)
       setCurrent(latest)
       setDraft(toMemoryInput(latest))
-      setDirty(pending.current.length > 0)
+      setDirty(pending.current.length > 0 || Object.keys(imageDescriptions).length > 0)
       setConflict(false)
       setError('')
     } catch (cause) {
@@ -226,6 +237,16 @@ export function MemoryEditor({
               memoryId={current.id}
               title={draft.title}
               editable
+              descriptions={imageDescriptions}
+              onDescriptionChange={(id, description) => {
+                setDirty(true)
+                setImageDescriptions((previous) => {
+                  const next = { ...previous }
+                  if (description === undefined) delete next[id]
+                  else next[id] = description
+                  return next
+                })
+              }}
               disabled={busy}
               revision={imageRevision}
               onExpired={onExpired}
@@ -237,6 +258,23 @@ export function MemoryEditor({
                 <li key={item.preview}>
                   <img src={item.preview} alt={content.editor.previewLabel(item.file.name)} />
                   <span className="pending-image-name">{item.file.name}</span>
+                  <label>
+                    {content.gallery.description}
+                    <textarea
+                      rows={2}
+                      maxLength={1000}
+                      value={item.description}
+                      onChange={(event) =>
+                        replaceAttachments(
+                          pending.current.map((attachment) =>
+                            attachment.preview === item.preview
+                              ? { ...attachment, description: event.target.value }
+                              : attachment,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
                   <button
                     type="button"
                     className="text-button"

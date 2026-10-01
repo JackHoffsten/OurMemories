@@ -11,6 +11,7 @@ export interface Memory {
 
 export type MemoryInput = Pick<Memory, 'title' | 'story' | 'memoryDate' | 'locationName'>
 export interface MemoryImage {
+  description: string
   id: string
   contentType: string
   width: number

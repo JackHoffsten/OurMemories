@@ -74,6 +74,8 @@ export const content = {
     removeLabel: (name: string) => `Ta bort ${name}`,
   },
   gallery: {
+    description: 'Bildbeskrivning',
+    descriptionLabel: (number: number) => `Beskrivning till bild ${number}`,
     loadFailed: 'Bilderna kunde inte visas.',
     retry: 'Försök igen',
     previous: 'Föregående bild',

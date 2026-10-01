@@ -17,11 +17,18 @@ export const memoriesApi = {
   delete: (id: string) => request<void>(`/memories/${id}`, { method: 'DELETE' }),
   images: (id: string, signal?: AbortSignal) =>
     request<MemoryImage[]>(`/memories/${id}/images`, { signal }),
-  uploadImage: (id: string, file: File) => {
+  uploadImage: (id: string, file: File, description = '') => {
     const body = new FormData()
     body.append('file', file)
+    body.append('description', description)
     return request<MemoryImage>(`/memories/${id}/images`, { method: 'POST', body })
   },
   deleteImage: (memoryId: string, imageId: string) =>
     request<void>(`/memories/${memoryId}/images/${imageId}`, { method: 'DELETE' }),
+  describeImage: (memoryId: string, imageId: string, description: string) =>
+    request<void>(`/memories/${memoryId}/images/${imageId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description }),
+    }),
 }

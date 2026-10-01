@@ -5,6 +5,7 @@ import type { MemoryImage } from '../../types'
 import './MemoryGallery.css'
 import { ChevronIcon } from '../../../../shared/components/ChevronIcon'
 import { content } from '../../../../config/content'
+import { ImageDescription } from './ImageDescription'
 
 export function MemoryGallery({
   memoryId,
@@ -13,6 +14,8 @@ export function MemoryGallery({
   revision = 0,
   disabled = false,
   onExpired,
+  descriptions = {},
+  onDescriptionChange,
 }: {
   memoryId: string
   title: string
@@ -20,6 +23,8 @@ export function MemoryGallery({
   revision?: number
   disabled?: boolean
   onExpired: () => void
+  descriptions?: Record<string, string>
+  onDescriptionChange?: (id: string, description: string | undefined) => void
 }) {
   const [images, setImages] = useState<MemoryImage[]>([])
   const [error, setError] = useState('')
@@ -94,6 +99,7 @@ export function MemoryGallery({
     try {
       await memoriesApi.deleteImage(memoryId, id)
       setImages((previous) => previous.filter((image) => image.id !== id))
+      onDescriptionChange?.(id, undefined)
       setError('')
     } catch (cause) {
       if (cause instanceof ApiError && cause.status === 401) onExpired()
@@ -142,13 +148,31 @@ export function MemoryGallery({
                 >
                   <img
                     src={imageUrl(memoryId, image.id)}
-                    alt=""
+                    alt={image.description || ''}
                     loading="lazy"
                     decoding="async"
                     width={image.width}
                     height={image.height}
                   />
                 </a>
+                {editable ? (
+                  <div className="image-description-editor">
+                    <label htmlFor={`image-description-${image.id}`}>
+                      {content.gallery.description}
+                    </label>
+                    <textarea
+                      id={`image-description-${image.id}`}
+                      aria-label={content.gallery.descriptionLabel(index + 1)}
+                      maxLength={1000}
+                      rows={2}
+                      value={descriptions[image.id] ?? image.description ?? ''}
+                      disabled={disabled || removing !== null}
+                      onChange={(event) => onDescriptionChange?.(image.id, event.target.value)}
+                    />
+                  </div>
+                ) : (
+                  image.description && <ImageDescription value={image.description} />
+                )}
                 {editable && (
                   <button
                     type="button"
