@@ -37,6 +37,9 @@
   text-shadow: 0 1px 4px #000;
   -webkit-tap-highlight-color: transparent;
 }
+.viewer-close:focus-visible {
+  outline: none;
+}
 @media (hover: hover) {
   .viewer-close:hover {
     opacity: 0.75;
