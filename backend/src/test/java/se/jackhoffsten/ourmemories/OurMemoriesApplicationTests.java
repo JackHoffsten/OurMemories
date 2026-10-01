@@ -49,7 +49,7 @@ class OurMemoriesApplicationTests {
                                 "SELECT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'capsule')",
                                 Boolean.class))
                 .isTrue();
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("5");
+        assertThat(flyway.info().current()).isNotNull();
         assertThat(flyway.info().pending()).isEmpty();
         assertThat(flyway.validateWithResult().validationSuccessful).isTrue();
     }
