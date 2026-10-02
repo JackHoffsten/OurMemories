@@ -7,7 +7,7 @@ export const content = {
   app: {
     opening: 'Öppnar våra minnen…',
     sessionExpired: 'Din session har gått ut. Logga in igen.',
-    footer: 'Jag älskar dig.'
+    footer: 'Jag älskar dig.',
   },
   login: {
     heading: 'Logga in för att öppna',
