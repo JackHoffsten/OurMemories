@@ -58,6 +58,7 @@
   background: var(--color-paper);
   color: var(--color-text);
   font: inherit;
+  font-size: max(16px, 1rem);
 }
 .timeline-meta span {
   color: inherit;
