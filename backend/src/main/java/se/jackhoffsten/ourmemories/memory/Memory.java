@@ -32,9 +32,13 @@ class Memory {
 
     @Version private long version;
 
+    @Column(name = "created_by", length = 32)
+    private String createdBy;
+
     protected Memory() {}
 
-    Memory(MemoryRequest request) {
+    Memory(MemoryRequest request, String username) {
+        createdBy = username;
         replace(request);
         createdAt = updatedAt;
     }
@@ -54,8 +58,20 @@ class Memory {
         return version;
     }
 
+    void assignCreatorIfMissing(String username) {
+        if (createdBy == null) createdBy = username;
+    }
+
     MemoryResponse toResponse() {
         return new MemoryResponse(
-                id, title, story, memoryDate, locationName, createdAt, updatedAt, version);
+                id,
+                title,
+                story,
+                memoryDate,
+                locationName,
+                createdAt,
+                updatedAt,
+                version,
+                createdBy);
     }
 }

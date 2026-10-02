@@ -46,19 +46,20 @@ class JpaMemoryService implements MemoryService {
 
     @Override
     @Transactional
-    public MemoryResponse create(MemoryRequest request) {
-        return memories.saveAndFlush(new Memory(request)).toResponse();
+    public MemoryResponse create(MemoryRequest request, String username) {
+        return memories.saveAndFlush(new Memory(request, username)).toResponse();
     }
 
     @Override
     @Transactional
-    public MemoryResponse update(UUID id, MemoryUpdateRequest request) {
+    public MemoryResponse update(UUID id, MemoryUpdateRequest request, String username) {
         Memory memory = find(id);
         if (memory.version() != request.version()) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT, "Memory has changed. Reload it before editing.");
         }
         memory.replace(request.content());
+        memory.assignCreatorIfMissing(username);
         memories.flush();
         return memory.toResponse();
     }

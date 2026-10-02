@@ -1,4 +1,5 @@
 export interface Memory {
+  createdBy: string | null
   id: string
   title: string
   story: string

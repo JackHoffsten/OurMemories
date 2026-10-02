@@ -2,6 +2,7 @@ package se.jackhoffsten.ourmemories.memory;
 
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.security.Principal;
 import java.util.UUID;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -30,14 +31,18 @@ class MemoryController {
     }
 
     @PostMapping
-    ResponseEntity<MemoryResponse> create(@Valid @RequestBody MemoryRequest request) {
-        MemoryResponse memory = memories.create(request);
+    ResponseEntity<MemoryResponse> create(
+            @Valid @RequestBody MemoryRequest request, Principal principal) {
+        MemoryResponse memory = memories.create(request, principal.getName());
         return ResponseEntity.created(URI.create("/api/memories/" + memory.id())).body(memory);
     }
 
     @PutMapping("/{id}")
-    MemoryResponse update(@PathVariable UUID id, @Valid @RequestBody MemoryUpdateRequest request) {
-        return memories.update(id, request);
+    MemoryResponse update(
+            @PathVariable UUID id,
+            @Valid @RequestBody MemoryUpdateRequest request,
+            Principal principal) {
+        return memories.update(id, request, principal.getName());
     }
 
     @DeleteMapping("/{id}")

@@ -37,6 +37,7 @@ export const content = {
     saved: 'Minnet har sparats.',
   },
   memory: {
+    createdBy: (username: string | null) => `Skapat av: ${username || 'Okänd'}`,
     readMore: 'Läs mer',
     readLess: 'Visa mindre',
     edit: 'Redigera minnet',

@@ -26,6 +26,7 @@ vi.mock('../features/memories/api', () => ({
 }))
 
 const memory: Memory = {
+  createdBy: 'first.user',
   id: 'one',
   title: 'Our first walk',
   story: 'Coffee by the water.\nA lovely afternoon.',
@@ -107,6 +108,7 @@ describe('our story', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Öppna' }))
     expect(await screen.findByRole('heading', { name: memory.title })).toBeTruthy()
     expect(screen.getByText('10 januari 2026')).toBeTruthy()
+    expect(screen.getByText('Skapat av: first.user')).toBeTruthy()
     expect(screen.queryByRole('button', { name: memory.title })).toBeNull()
     expect(screen.queryByRole('button', { name: memory.locationName! })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Läs mer' })).toBeNull()

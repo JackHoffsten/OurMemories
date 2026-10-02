@@ -82,6 +82,7 @@ export function MemoryCard({
           )}
         </p>
         <MemoryGallery memoryId={memory.id} title={memory.title} onExpired={onExpired} />
+        <p className="memory-creator">{content.memory.createdBy(memory.createdBy)}</p>
         {deleting ? (
           <div className="delete-confirmation">
             <p>{content.memory.deleteQuestion(memory.title)}</p>

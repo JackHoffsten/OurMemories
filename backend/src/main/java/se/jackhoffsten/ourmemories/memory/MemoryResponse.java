@@ -12,4 +12,5 @@ public record MemoryResponse(
         String locationName,
         Instant createdAt,
         Instant updatedAt,
-        long version) {}
+        long version,
+        String createdBy) {}

@@ -8,9 +8,9 @@ public interface MemoryService {
 
     MemoryResponse get(UUID id);
 
-    MemoryResponse create(MemoryRequest request);
+    MemoryResponse create(MemoryRequest request, String username);
 
-    MemoryResponse update(UUID id, MemoryUpdateRequest request);
+    MemoryResponse update(UUID id, MemoryUpdateRequest request, String username);
 
     void delete(UUID id);
 }

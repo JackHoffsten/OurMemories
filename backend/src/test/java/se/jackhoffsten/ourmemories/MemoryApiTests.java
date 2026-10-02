@@ -61,12 +61,14 @@ class MemoryApiTests {
         mvc.perform(get("/api/memories/" + id).session(session))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("First walk"))
+                .andExpect(jsonPath("$.createdBy").value("first.user"))
                 .andExpect(jsonPath("$.locationName").value("Stockholm"))
                 .andExpect(jsonPath("$.version").value(0));
         mvc.perform(write(put("/api/memories/" + id)).content(updateBody(0)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.version").value(1))
                 .andExpect(jsonPath("$.title").value("Updated walk"))
+                .andExpect(jsonPath("$.createdBy").value("first.user"))
                 .andExpect(jsonPath("$.locationName").isEmpty());
         assertThat(
                         jdbc.queryForObject(
@@ -104,6 +106,23 @@ class MemoryApiTests {
             mvc.perform(get("/api/memories?" + query).session(session))
                     .andExpect(status().isBadRequest());
         }
+    }
+
+    @Test
+    void firstEditAssignsMissingCreatorAndLaterEditsKeepIt() throws Exception {
+        String id = create("Legacy memory", "2026-01-10");
+        jdbc.update(
+                "UPDATE capsule.memories SET created_by = NULL WHERE id = ?", UUID.fromString(id));
+        login("second.user");
+        mvc.perform(write(put("/api/memories/" + id)).content(updateBody(0)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.createdBy").value("second.user"));
+        login("first.user");
+        mvc.perform(write(put("/api/memories/" + id)).content(updateBody(1)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.createdBy").value("second.user"));
+        mvc.perform(get("/api/memories/" + id).session(session))
+                .andExpect(jsonPath("$.createdBy").value("second.user"));
     }
 
     @Test
