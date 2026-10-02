@@ -62,8 +62,7 @@ function App() {
         )}
       </main>
       <footer>
-        {content.app.footer}{' '}
-        <img className="site-logo" src="/logo.svg" alt="" width="28" height="28" />
+        {content.app.footer}
       </footer>
     </>
   )
