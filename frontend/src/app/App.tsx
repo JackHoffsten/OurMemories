@@ -61,9 +61,7 @@ function App() {
           />
         )}
       </main>
-      <footer>
-        {content.app.footer}
-      </footer>
+      <footer>{content.app.footer}</footer>
     </>
   )
 }
