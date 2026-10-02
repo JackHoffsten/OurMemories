@@ -15,6 +15,11 @@ footer {
 footer span {
   color: var(--color-accent);
 }
+.site-logo {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.35rem;
+}
 @media (max-width: 640px) {
   main,
   footer {

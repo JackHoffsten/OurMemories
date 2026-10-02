@@ -62,7 +62,8 @@ function App() {
         )}
       </main>
       <footer>
-        {content.app.footer} <span aria-hidden="true">♡</span>
+        {content.app.footer}{' '}
+        <img className="site-logo" src="/logo.svg" alt="" width="28" height="28" />
       </footer>
     </>
   )
