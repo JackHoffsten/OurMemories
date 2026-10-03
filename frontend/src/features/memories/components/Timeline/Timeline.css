@@ -1,6 +1,11 @@
 .timeline {
   padding: clamp(2rem, 6vw, 4rem) 0 3rem;
 }
+.timeline-bottom-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
 .timeline-heading {
   display: flex;
   align-items: center;

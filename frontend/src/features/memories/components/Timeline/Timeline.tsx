@@ -185,6 +185,13 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
                 </button>
               </nav>
             )}
+            {data.items.length > 0 && (
+              <div className="timeline-bottom-actions">
+                <button className="primary" onClick={() => setEditor('new')}>
+                  {content.timeline.add}
+                </button>
+              </div>
+            )}
           </>
         )
       )}
