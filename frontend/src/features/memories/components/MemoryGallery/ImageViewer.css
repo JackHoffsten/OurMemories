@@ -52,7 +52,8 @@
 .viewer-arrow:disabled {
   opacity: 0.25;
 }
-.viewer-close:focus-visible {
+.viewer-close:focus-visible,
+.viewer-arrow:focus-visible {
   outline: none;
 }
 @media (hover: hover) {
