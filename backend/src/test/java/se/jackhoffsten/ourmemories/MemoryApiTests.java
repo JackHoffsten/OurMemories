@@ -354,6 +354,29 @@ class MemoryApiTests {
         return id;
     }
 
+    @Test
+    void searchesMemoriesWithLiteralCaseInsensitiveText() throws Exception {
+        create("First walk", "2025-01-10");
+        create("100% sunshine", "2026-01-10");
+        for (String term : new String[] {"FIRST", "sunshine", "%"}) {
+            mvc.perform(get("/api/memories").param("search", term).session(session))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.totalElements").value(1));
+        }
+        mvc.perform(
+                        get("/api/memories")
+                                .param("search", "stockholm")
+                                .param("size", "1")
+                                .session(session))
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.totalPages").value(2));
+        mvc.perform(get("/api/memories").param("search", "no match").session(session))
+                .andExpect(jsonPath("$.totalMemories").value(2))
+                .andExpect(jsonPath("$.totalElements").value(0));
+        mvc.perform(get("/api/memories").param("search", "x".repeat(201)).session(session))
+                .andExpect(status().isBadRequest());
+    }
+
     private String body(String title, String date) {
         return json.writeValueAsString(
                 Map.of(

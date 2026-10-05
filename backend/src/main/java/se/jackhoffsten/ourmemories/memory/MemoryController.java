@@ -21,8 +21,9 @@ class MemoryController {
     MemoryPage list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "ASC") Sort.Direction order) {
-        return memories.list(page, size, order);
+            @RequestParam(defaultValue = "ASC") Sort.Direction order,
+            @RequestParam(defaultValue = "") String search) {
+        return memories.list(page, size, order, search);
     }
 
     @GetMapping("/{id}")

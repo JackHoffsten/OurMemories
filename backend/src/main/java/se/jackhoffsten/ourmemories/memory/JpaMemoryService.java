@@ -18,7 +18,11 @@ class JpaMemoryService implements MemoryService {
     }
 
     @Override
-    public MemoryPage list(int page, int size, Sort.Direction order) {
+    public MemoryPage list(int page, int size, Sort.Direction order, String search) {
+        if (search.length() > 200) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Search must be at most 200 characters.");
+        }
         if (page < 0 || size < 1 || size > 100) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Page must be nonnegative and size must be 1–100.");
@@ -28,15 +32,19 @@ class JpaMemoryService implements MemoryService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page offset is too large.");
         }
 
+        var pageable = PageRequest.of(page, size, Sort.by(order, "memoryDate", "id"));
         var result =
-                memories.findAll(PageRequest.of(page, size, Sort.by(order, "memoryDate", "id")));
+                search.isBlank()
+                        ? memories.findAll(pageable)
+                        : memories.search(search.strip(), pageable);
 
         return new MemoryPage(
                 result.getContent().stream().map((Memory m) -> m.toResponse()).toList(),
                 page,
                 size,
                 result.getTotalElements(),
-                result.getTotalPages());
+                result.getTotalPages(),
+                search.isBlank() ? result.getTotalElements() : memories.count());
     }
 
     @Override

@@ -9,11 +9,13 @@ import { content } from '../../../../config/content'
 
 export function Timeline({ onExpired }: { onExpired: () => void }) {
   const [page, setPage] = useState(0)
+  const [searchDraft, setSearchDraft] = useState('')
+  const [search, setSearch] = useState('')
   const [order, setOrder] = useState<'ASC' | 'DESC'>('ASC')
   const [revision, setRevision] = useState(0)
   const [data, setData] = useState<MemoryPage | null>(null)
   const [loaded, setLoaded] = useState('')
-  const loading = loaded !== `${page}:${revision}:${order}`
+  const loading = loaded !== `${page}:${revision}:${order}:${search}`
   const [error, setError] = useState('')
   const [editor, setEditor] = useState<Memory | 'new' | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
@@ -22,9 +24,22 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
   const addButton = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
+    const value = searchDraft.trim()
+    if (value === search) return
+    const timeout = window.setTimeout(
+      () => {
+        setSearch(value)
+        setPage(0)
+      },
+      value ? 250 : 0,
+    )
+    return () => window.clearTimeout(timeout)
+  }, [searchDraft, search])
+
+  useEffect(() => {
     const controller = new AbortController()
     memoriesApi
-      .memories(page, controller.signal, order)
+      .memories(page, controller.signal, order, search)
       .then((result) => {
         if (controller.signal.aborted) return
         setError('')
@@ -37,10 +52,10 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
         else setError(errorMessage(cause))
       })
       .finally(() => {
-        if (!controller.signal.aborted) setLoaded(`${page}:${revision}:${order}`)
+        if (!controller.signal.aborted) setLoaded(`${page}:${revision}:${order}:${search}`)
       })
     return () => controller.abort()
-  }, [page, revision, order, onExpired])
+  }, [page, revision, order, search, onExpired])
 
   function closeEditor() {
     setEditor(null)
@@ -103,6 +118,37 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
           {content.timeline.add}
         </button>
       </div>
+      <form
+        className="memory-search"
+        role="search"
+        onSubmit={(event) => {
+          event.preventDefault()
+          setSearch(searchDraft.trim())
+          setPage(0)
+        }}
+      >
+        <input
+          type="search"
+          aria-label={content.timeline.searchLabel}
+          placeholder={content.timeline.searchPlaceholder}
+          maxLength={200}
+          value={searchDraft}
+          onChange={(event) => setSearchDraft(event.target.value)}
+        />
+        {searchDraft && (
+          <button
+            className="text-button"
+            type="button"
+            onClick={() => {
+              setSearchDraft('')
+              setSearch('')
+              setPage(0)
+            }}
+          >
+            {content.timeline.clearSearch}
+          </button>
+        )}
+      </form>
       <p className="sr-only" role="status">
         {announcement}
       </p>
@@ -114,7 +160,7 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
           </button>
         </div>
       )}
-      {loading ? (
+      {loading && !data ? (
         <p className="status" role="status">
           {content.timeline.loading}
         </p>
@@ -124,8 +170,8 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
           <>
             <div className="timeline-meta">
               <span>
-                {data.totalElements}{' '}
-                {data.totalElements === 1 ? content.timeline.savedOne : content.timeline.savedMany}
+                {data.totalMemories}{' '}
+                {data.totalMemories === 1 ? content.timeline.savedOne : content.timeline.savedMany}
               </span>
               <select
                 className="timeline-order"
@@ -143,10 +189,12 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
             {data.items.length === 0 ? (
               <div className="empty-state">
                 <span aria-hidden="true">♡</span>
-                <h2>{content.timeline.emptyHeading}</h2>
-                <button className="secondary" onClick={() => setEditor('new')}>
-                  {content.timeline.addFirst}
-                </button>
+                <h2>{search ? content.timeline.noResults : content.timeline.emptyHeading}</h2>
+                {!search && (
+                  <button className="secondary" onClick={() => setEditor('new')}>
+                    {content.timeline.addFirst}
+                  </button>
+                )}
               </div>
             ) : (
               <ol className="memory-list">

@@ -36,7 +36,14 @@ const memory: Memory = {
   updatedAt: '',
   version: 2,
 }
-const page = { items: [memory], page: 0, size: 20, totalElements: 1, totalPages: 1 }
+const page = {
+  items: [memory],
+  page: 0,
+  size: 20,
+  totalElements: 1,
+  totalPages: 1,
+  totalMemories: 1,
+}
 const mocked = vi.mocked({ ...authApi, ...memoriesApi })
 
 beforeEach(() => {
@@ -48,6 +55,49 @@ beforeEach(() => {
 afterEach(cleanup)
 
 describe('our story', () => {
+  it('searches while typing and clears the search', async () => {
+    render(<App />)
+    fireEvent.change(await screen.findByRole('searchbox'), { target: { value: '  Stockholm  ' } })
+    expect(screen.queryByRole('button', { name: 'Sök' })).toBeNull()
+    await waitFor(() =>
+      expect(mocked.memories).toHaveBeenLastCalledWith(
+        0,
+        expect.any(AbortSignal),
+        'ASC',
+        'Stockholm',
+      ),
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Visa alla' }))
+    await waitFor(() =>
+      expect(mocked.memories).toHaveBeenLastCalledWith(0, expect.any(AbortSignal), 'ASC', ''),
+    )
+  })
+  it('keeps memories visible during search and keeps the full count for empty results', async () => {
+    render(<App />)
+    await screen.findByRole('heading', { name: memory.title })
+    let resolveSearch!: (result: typeof page) => void
+    mocked.memories.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveSearch = resolve
+        }),
+    )
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'missing' } })
+    await waitFor(() =>
+      expect(mocked.memories).toHaveBeenLastCalledWith(
+        0,
+        expect.any(AbortSignal),
+        'ASC',
+        'missing',
+      ),
+    )
+    expect(screen.getByRole('heading', { name: memory.title })).toBeTruthy()
+    expect(screen.queryByText('Hämtar våra minnen…')).toBeNull()
+    resolveSearch({ ...page, items: [], totalElements: 0, totalPages: 0 })
+    await screen.findByRole('heading', { name: 'Inga minnen hittades' })
+    expect(screen.getByText('1 sparat minne')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Lägg till vårt första minne' })).toBeNull()
+  })
   it('edits and clears an image description', async () => {
     vi.stubGlobal(
       'ResizeObserver',
@@ -245,11 +295,11 @@ describe('our story', () => {
     expect((screen.getByLabelText('Sortera minnen') as HTMLSelectElement).value).toBe('ASC')
     fireEvent.click(screen.getByRole('button', { name: 'Nyare minnen' }))
     await waitFor(() =>
-      expect(mocked.memories).toHaveBeenLastCalledWith(1, expect.any(AbortSignal), 'ASC'),
+      expect(mocked.memories).toHaveBeenLastCalledWith(1, expect.any(AbortSignal), 'ASC', ''),
     )
     fireEvent.change(await screen.findByLabelText('Sortera minnen'), { target: { value: 'DESC' } })
     await waitFor(() =>
-      expect(mocked.memories).toHaveBeenLastCalledWith(0, expect.any(AbortSignal), 'DESC'),
+      expect(mocked.memories).toHaveBeenLastCalledWith(0, expect.any(AbortSignal), 'DESC', ''),
     )
   })
 

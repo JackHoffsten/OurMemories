@@ -21,6 +21,7 @@ export interface MemoryImage {
 }
 
 export interface MemoryPage {
+  totalMemories: number
   items: Memory[]
   page: number
   size: number

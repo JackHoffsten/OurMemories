@@ -1,6 +1,17 @@
 .timeline {
   padding: clamp(2rem, 6vw, 4rem) 0 3rem;
 }
+.memory-search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+.memory-search input {
+  flex: 1 1 180px;
+  min-width: 0;
+}
 .timeline-bottom-actions {
   display: flex;
   justify-content: center;

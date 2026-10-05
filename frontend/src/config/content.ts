@@ -18,6 +18,10 @@ export const content = {
     invalidCredentials: 'Användarnamnet eller lösenordet är fel.',
   },
   timeline: {
+    searchLabel: 'Sök bland våra minnen',
+    searchPlaceholder: 'Titel, berättelse eller plats…',
+    clearSearch: 'Visa alla',
+    noResults: 'Inga minnen hittades',
     heading: 'Våra minnen',
     add: '+ Lägg till ett minne',
     retry: 'Försök igen',

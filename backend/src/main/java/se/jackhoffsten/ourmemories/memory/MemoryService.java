@@ -4,7 +4,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Sort;
 
 public interface MemoryService {
-    MemoryPage list(int page, int size, Sort.Direction order);
+    MemoryPage list(int page, int size, Sort.Direction order, String search);
 
     MemoryResponse get(UUID id);
 
