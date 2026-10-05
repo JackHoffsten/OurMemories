@@ -19,7 +19,8 @@
   height: 100%;
   object-fit: contain;
 }
-.viewer-close {
+.viewer-close,
+.viewer-arrow {
   position: absolute;
   top: max(0.75rem, env(safe-area-inset-top));
   right: max(0.75rem, env(safe-area-inset-right));
@@ -36,6 +37,20 @@
   line-height: 1;
   text-shadow: 0 1px 4px #000;
   -webkit-tap-highlight-color: transparent;
+}
+.viewer-arrow {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.viewer-arrow-prev {
+  left: max(0.5rem, env(safe-area-inset-left));
+  right: auto;
+}
+.viewer-arrow-next {
+  right: max(0.5rem, env(safe-area-inset-right));
+}
+.viewer-arrow:disabled {
+  opacity: 0.25;
 }
 .viewer-close:focus-visible {
   outline: none;

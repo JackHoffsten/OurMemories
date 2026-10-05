@@ -30,7 +30,8 @@ it('shows only the selected image and close button and restores scrolling', () =
     <ImageViewer
       memoryId="memory"
 
-      image={images[1]}
+      images={images}
+      initialIndex={1}
 
       onClose={onClose}
     />,
@@ -38,7 +39,19 @@ it('shows only the selected image and close button and restores scrolling', () =
   expect(document.body.style.overflow).toBe('hidden')
   expect(screen.getByAltText('Second caption')).toBeTruthy()
   expect(screen.queryByText('Second caption')).toBeNull()
-  expect(screen.getAllByRole('button')).toHaveLength(1)
+  expect((screen.getByRole('button', { name: 'Nästa bild' }) as HTMLButtonElement).disabled).toBe(
+    true,
+  )
+  fireEvent.click(screen.getByRole('button', { name: 'Föregående bild' }))
+  expect(screen.getByAltText('First caption')).toBeTruthy()
+  fireEvent.keyDown(screen.getByRole('dialog'), { key: 'ArrowRight' })
+  expect(screen.getByAltText('Second caption')).toBeTruthy()
+  fireEvent.touchStart(screen.getByRole('img'), { touches: [{ clientX: 80, clientY: 100 }] })
+  fireEvent.touchEnd(screen.getByRole('img'), {
+    touches: [],
+    changedTouches: [{ clientX: 200, clientY: 100 }],
+  })
+  expect(screen.getByAltText('First caption')).toBeTruthy()
   fireEvent.click(screen.getByRole('button', { name: 'Stäng bildvisaren' }))
   expect(onClose).toHaveBeenCalledOnce()
   unmount()

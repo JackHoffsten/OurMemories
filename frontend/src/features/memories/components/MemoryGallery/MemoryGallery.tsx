@@ -117,7 +117,8 @@ export function MemoryGallery({
       {viewerIndex !== null && images.length > 0 && (
         <ImageViewer
           memoryId={memoryId}
-          image={images[Math.min(viewerIndex, images.length - 1)]}
+          images={images}
+          initialIndex={Math.min(viewerIndex, images.length - 1)}
           onClose={() => {
             setViewerIndex(null)
             viewerTrigger.current?.focus()
