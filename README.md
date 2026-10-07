@@ -212,3 +212,7 @@ npm run build
 
 Use `npm.cmd run format` on Windows or `npm run format` on macOS/Linux to format
 frontend code. Production assets are written to `frontend/dist`.
+
+## License
+
+Licensed under the [MIT License](LICENSE).
