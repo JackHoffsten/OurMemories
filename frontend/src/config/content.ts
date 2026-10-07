@@ -20,7 +20,7 @@ export const content = {
   timeline: {
     searchLabel: 'Sök bland våra minnen',
     searchPlaceholder: 'Titel, berättelse eller plats…',
-    clearSearch: 'Visa alla',
+    clearSearch: 'Rensa sökningen',
     noResults: 'Inga minnen hittades',
     heading: 'Våra minnen',
     add: '+ Lägg till ett minne',

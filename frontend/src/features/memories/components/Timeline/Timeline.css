@@ -2,6 +2,7 @@
   padding: clamp(2rem, 6vw, 4rem) 0 3rem;
 }
 .memory-search {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -11,6 +12,28 @@
 .memory-search input {
   flex: 1 1 180px;
   min-width: 0;
+  padding-right: 3.25rem;
+}
+.memory-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+.search-clear {
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 1.5rem;
+}
+.search-clear span {
+  color: inherit;
 }
 .timeline-bottom-actions {
   display: flex;

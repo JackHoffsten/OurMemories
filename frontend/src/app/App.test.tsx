@@ -67,7 +67,7 @@ describe('our story', () => {
         'Stockholm',
       ),
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Visa alla' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Rensa sökningen' }))
     await waitFor(() =>
       expect(mocked.memories).toHaveBeenLastCalledWith(0, expect.any(AbortSignal), 'ASC', ''),
     )

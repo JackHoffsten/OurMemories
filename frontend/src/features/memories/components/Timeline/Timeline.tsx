@@ -137,15 +137,16 @@ export function Timeline({ onExpired }: { onExpired: () => void }) {
         />
         {searchDraft && (
           <button
-            className="text-button"
+            className="search-clear"
             type="button"
+            aria-label={content.timeline.clearSearch}
             onClick={() => {
               setSearchDraft('')
               setSearch('')
               setPage(0)
             }}
           >
-            {content.timeline.clearSearch}
+            <span aria-hidden="true">×</span>
           </button>
         )}
       </form>
